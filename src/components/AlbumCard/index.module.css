@@ -1,0 +1,34 @@
+.album-card {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.album-card img {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.album-card-body {
+  padding: 22px;
+}
+
+.album-meta {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.album-card h3 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  font-weight: 300;
+}
+
+.album-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
