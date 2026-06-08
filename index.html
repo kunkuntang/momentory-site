@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Momentory - 首页</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+  </head>
+  <body data-page="home">
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Momentory 首页">
+        <span class="brand-mark" data-logo-text>M</span>
+        <span class="brand-name" data-site-name>Momentory</span>
+      </a>
+      <nav class="site-nav" data-nav aria-label="主导航"></nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-label="照片轮播">
+        <div data-hero></div>
+        <div class="hero-dots" data-hero-dots></div>
+      </section>
+
+      <section class="section">
+        <div class="section-inner">
+          <div class="section-head">
+            <h2 class="section-title">最新相册</h2>
+            <a class="text-link" href="albums.html">展示更多</a>
+          </div>
+          <div class="album-grid" data-latest-albums></div>
+        </div>
+      </section>
+
+      <section class="section featured">
+        <div class="section-inner">
+          <div class="section-head">
+            <h2 class="section-title">精选图片</h2>
+          </div>
+          <div class="feature-list" data-featured></div>
+        </div>
+      </section>
+
+      <section class="section profile-band">
+        <div class="section-inner">
+          <div class="profile-card" data-profile-card></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span data-site-name>Momentory</span>
+      <span data-copyright></span>
+    </footer>
+
+    <script src="assets/app.js"></script>
+  </body>
+</html>
