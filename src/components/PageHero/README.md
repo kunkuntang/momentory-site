@@ -6,3 +6,4 @@
 
 - `title`: 页面标题。
 - `description`: 页面说明。
+- `backgroundImageUrl`: 可选背景图地址，传入后会显示透明遮罩背景。
