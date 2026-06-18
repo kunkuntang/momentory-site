@@ -1,13 +1,46 @@
 .album-card {
+  display: block;
   overflow: hidden;
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 8px;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.album-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(64, 86, 59, 0.22);
+  box-shadow: var(--shadow);
+}
+
+.album-cover {
+  position: relative;
 }
 
 .album-card img {
   aspect-ratio: 4 / 3;
   object-fit: cover;
+}
+
+.private-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: rgba(23, 23, 23, 0.78);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
 }
 
 .album-card-body {

@@ -3,7 +3,8 @@
 }
 
 .section {
-  padding: clamp(68px, 10vw, 120px) clamp(20px, 5vw, 64px);
+  /* padding: clamp(68px, 10vw, 120px) clamp(20px, 5vw, 64px); */
+  padding: clamp(48px, 8vw, 100px) clamp(20px, 5vw, 64px);
 }
 
 .section-inner {

@@ -5,6 +5,7 @@ import './styles/global.css';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import AlbumsPage from './pages/AlbumsPage';
+import AlbumDetailPage from './pages/AlbumDetailPage';
 import AboutPage from './pages/AboutPage';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
@@ -15,6 +16,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="albums" element={<AlbumsPage />} />
+          <Route path="albums/:albumId" element={<AlbumDetailPage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

@@ -64,27 +64,108 @@ const siteData = {
       title: '海岸光线',
       summary: '海边、浪花、阴天与突然明亮起来的天空。',
       date: '2026-04',
-      photoCount: 18,
+      photoCount: 6,
+      isPrivate: true,
       coverImageUrl: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=900&q=80',
       coverImageAlt: '海浪拍打岸边',
+      photos: [
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '海浪拍打岸边',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '黄昏时分的海岸与浪花',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '云层下的海边山野',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '阳光照在海面的波纹上',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1501959915551-4e8b96f9f47c?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '带有礁石的清晨海面',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1493558103817-58b2924bce98?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '潮湿空气中的海边步道',
+        },
+      ],
     },
     {
       id: 'quiet-city',
       title: '安静城市',
       summary: '在街角、站台和玻璃反光里寻找平静。',
       date: '2026-02',
-      photoCount: 24,
+      photoCount: 6,
       coverImageUrl: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=900&q=80',
       coverImageAlt: '城市街道与建筑',
+      isPrivate: true,
+      photos: [
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '清晨时分的城市街道与建筑',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '傍晚城市交通和街景',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '下雨后的夜晚城市',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '高楼之间的城市透视',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1431274172761-fca41d930114?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '电车经过的城市街角',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '静谧的夜晚街道与灯光',
+        },
+      ],
     },
     {
       id: 'green-days',
       title: '绿色时日',
       summary: '树影、草地和散步途中遇见的自然切片。',
       date: '2025-10',
-      photoCount: 15,
+      photoCount: 6,
+      isPrivate: false,
       coverImageUrl: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=80',
       coverImageAlt: '阳光穿过森林',
+      photos: [
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '阳光穿过森林',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1473773508845-188df298d2d1?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '树林中的小路',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '高处俯瞰的林间道路',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '草地上的白色小花',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '山谷中的湖泊与树林',
+        },
+        {
+          imageUrl: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=1200&q=80',
+          imageAlt: '树木环绕的山间步道',
+        },
+      ],
     },
   ],
   featuredPhotos: [
@@ -132,6 +213,8 @@ const siteData = {
 
 export type SiteData = typeof siteData;
 export type Album = SiteData['latestAlbums'][number];
+export type AlbumPhoto = Album['photos'][number];
 export type FeaturePhoto = SiteData['featuredPhotos'][number];
 export type NavigationItem = SiteData['navigation'][number];
+export const findAlbumById = (albumId: string) => siteData.latestAlbums.find((album) => album.id === albumId);
 export default siteData;

@@ -3,12 +3,12 @@ import classnames from 'classnames/bind';
 import localStyle from './index.module.css';
 
 const cx = classnames.bind(localStyle);
-const ACCESS_STORAGE_KEY = 'momentory.albumAccessGranted';
 const configuredPassword = import.meta.env.VITE_ALBUM_PASSWORD?.trim() ?? '';
 
 interface IAlbumAccessGateProps extends PropsWithChildren {
   title?: string;
   description?: string;
+  storageKey?: string;
 }
 
 function AlbumAccessGate(props: IAlbumAccessGateProps) {
@@ -16,6 +16,7 @@ function AlbumAccessGate(props: IAlbumAccessGateProps) {
     children,
     title = '相册需要密码访问',
     description = '输入密码后即可查看站内相册内容。本次设备解锁后，在当前浏览器里会保持访问状态。',
+    storageKey = 'momentory.albumAccessGranted',
   } = props;
   const [password, setPassword] = useState('');
   const [hasAccess, setHasAccess] = useState(!configuredPassword);
@@ -27,15 +28,20 @@ function AlbumAccessGate(props: IAlbumAccessGateProps) {
       return;
     }
 
-    const isGranted = window.sessionStorage.getItem(ACCESS_STORAGE_KEY) === 'true';
+    const isGranted = window.sessionStorage.getItem(storageKey) === 'true';
     setHasAccess(isGranted);
-  }, []);
+  }, [storageKey]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!configuredPassword) {
+      setHasAccess(true);
+      return;
+    }
+
     if (password === configuredPassword) {
-      window.sessionStorage.setItem(ACCESS_STORAGE_KEY, 'true');
+      window.sessionStorage.setItem(storageKey, 'true');
       setHasAccess(true);
       setErrorMessage('');
       setPassword('');
