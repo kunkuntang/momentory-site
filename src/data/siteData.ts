@@ -21,6 +21,17 @@ const siteData = {
   ],
   heroSlides: [
     {
+      type: 'video',
+      title: '光影片刻',
+      caption: '一段短暂的动态画面，把风、光和时间一起留在首页。',
+      date: '2026-05-02',
+      location: '日常记录',
+      videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      posterImageUrl: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1800&q=82',
+      imageAlt: '花朵在阳光中轻轻摆动的视频',
+    },
+    {
+      type: 'image',
       title: '雨后海岸',
       caption: '潮湿的风从海面吹来，暮色像一层薄纱落在礁石上。',
       date: '2026-04-18',
@@ -29,6 +40,7 @@ const siteData = {
       imageAlt: '雨后傍晚的海岸线',
     },
     {
+      type: 'image',
       title: '山间清晨',
       caption: '第一束光越过山脊，云雾在树梢之间慢慢散开。',
       date: '2026-03-09',
@@ -37,6 +49,7 @@ const siteData = {
       imageAlt: '晨光中的山野和森林',
     },
     {
+      type: 'image',
       title: '城市夜行',
       caption: '路灯、橱窗和雨水把夜晚折叠成一条发亮的街。',
       date: '2025-12-27',
