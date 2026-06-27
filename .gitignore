@@ -1,4 +1,6 @@
 node_modules/
+.next/
+.pnpm-store/
 dist/
 .npm-cache/
 *.tsbuildinfo
@@ -6,3 +8,4 @@ vite.config.js
 vite.config.d.ts
 .codex/
 .tmc-cli-env
+.env
