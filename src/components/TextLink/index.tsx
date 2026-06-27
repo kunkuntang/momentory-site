@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import classnames from 'classnames/bind';
 import localStyle from './index.module.css';
 
@@ -15,7 +15,7 @@ function TextLink(props: ITextLinkProps) {
   const { children, to } = props;
 
   return (
-    <Link className={cx('text-link')} to={to}>
+    <Link className={cx('text-link')} href={to}>
       <span>{children}</span>
       <ArrowRight size={16} aria-hidden="true" />
     </Link>

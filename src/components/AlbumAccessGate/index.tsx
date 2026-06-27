@@ -1,9 +1,11 @@
+'use client';
+
 import { FormEvent, PropsWithChildren, useEffect, useState } from 'react';
 import classnames from 'classnames/bind';
 import localStyle from './index.module.css';
 
 const cx = classnames.bind(localStyle);
-const configuredPassword = import.meta.env.VITE_ALBUM_PASSWORD?.trim() ?? '';
+const configuredPassword = process.env.NEXT_PUBLIC_ALBUM_PASSWORD?.trim() ?? '';
 
 interface IAlbumAccessGateProps extends PropsWithChildren {
   title?: string;

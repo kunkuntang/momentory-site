@@ -1,6 +1,6 @@
 import classnames from 'classnames/bind';
 import { Lock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import localStyle from './index.module.css';
 import type { Album } from '../../data/siteData';
 
@@ -14,7 +14,7 @@ function AlbumCard(props: IAlbumCardProps) {
   const { album } = props;
 
   return (
-    <Link to={`/albums/${album.id}`} className={cx('album-card')}>
+    <Link href={`/albums/${album.id}`} className={cx('album-card')}>
       <article>
         <div className={cx('album-cover')}>
           <img src={album.coverImageUrl} alt={album.coverImageAlt} loading="lazy" />

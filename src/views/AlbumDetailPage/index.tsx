@@ -1,19 +1,18 @@
 import classnames from 'classnames/bind';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import Link from 'next/link';
 import AlbumAccessGate from '../../components/AlbumAccessGate';
 import PageHero from '../../components/PageHero';
-import { findAlbumById } from '../../data/siteData';
+import type { Album } from '../../data/siteData';
 import localStyle from './index.module.css';
 
 const cx = classnames.bind(localStyle);
 
-function AlbumDetailPage() {
-  const { albumId = '' } = useParams();
-  const album = findAlbumById(albumId);
+interface IAlbumDetailPageProps {
+  album: Album;
+}
 
-  if (!album) {
-    return <Navigate to="/albums" replace />;
-  }
+function AlbumDetailPage(props: IAlbumDetailPageProps) {
+  const { album } = props;
 
   const gallery = (
     <div className={cx('gallery-grid')}>
@@ -34,7 +33,7 @@ function AlbumDetailPage() {
       />
       <section className={cx('section')}>
         <div className={cx('section-inner')}>
-          <Link to="/albums" className={cx('back-link')}>
+          <Link href="/albums" className={cx('back-link')}>
             返回相册列表
           </Link>
           <div className={cx('album-head')}>
