@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import AlbumDetailPage from '../../../views/AlbumDetailPage';
-import { getAlbumBySlug } from '../../../lib/repositories/albums';
+import AlbumDetailPage from '../../../../views/AlbumDetailPage';
+import { getAlbumBySlug } from '../../../../lib/repositories/albums';
 
 interface IAlbumPageProps {
   params: Promise<{

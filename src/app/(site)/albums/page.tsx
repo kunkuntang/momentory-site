@@ -1,4 +1,4 @@
-import AlbumsPage from '../../views/AlbumsPage';
+import AlbumsPage from '../../../views/AlbumsPage';
 
 export default function Page() {
   return <AlbumsPage />;

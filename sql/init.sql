@@ -1,5 +1,7 @@
 PRAGMA foreign_keys = ON;
 
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS user_roles;
 DROP TABLE IF EXISTS site_config;
 DROP TABLE IF EXISTS menu;
 DROP TABLE IF EXISTS featured_photos;
@@ -146,3 +148,27 @@ INSERT INTO menu (label, url, link_type, sort_order, is_active) VALUES
 ('首页', '/', 'inner', 0, 1),
 ('相册', '/albums', 'inner', 1, 1),
 ('关于', '/about', 'inner', 2, 1);
+
+CREATE TABLE user_roles (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name VARCHAR(64) UNIQUE NOT NULL,
+  description TEXT,
+  permissions TEXT NOT NULL DEFAULT '[]',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username VARCHAR(64) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  role_id INTEGER NOT NULL,
+  is_active BOOLEAN DEFAULT 1,
+  last_login_at DATETIME,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (role_id) REFERENCES user_roles(id) ON DELETE RESTRICT
+);
+
+INSERT INTO user_roles (name, description, permissions) VALUES
+('super_admin', '超级管理员，拥有全部权限', '["*"]');
