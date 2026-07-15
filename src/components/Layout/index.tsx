@@ -2,13 +2,17 @@ import type { PropsWithChildren } from 'react';
 import classnames from 'classnames/bind';
 import Header from '../Header';
 import Footer from '../Footer';
-import siteData from '../../data/siteData';
+import type { SiteData } from '../../data/siteData';
 import localStyle from './index.module.css';
 
 const cx = classnames.bind(localStyle);
 
-function Layout(props: PropsWithChildren) {
-  const { children } = props;
+interface LayoutProps extends PropsWithChildren {
+  siteData: SiteData;
+}
+
+function Layout(props: LayoutProps) {
+  const { children, siteData } = props;
 
   return (
     <div className={cx('layout')}>

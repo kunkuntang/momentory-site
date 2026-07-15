@@ -2,11 +2,13 @@ import classnames from "classnames/bind";
 import localStyle from "./index.module.css";
 import AlbumCard from "../../components/AlbumCard";
 import PageHero from "../../components/PageHero";
-import siteData from "../../data/siteData";
+import { getAllAlbums } from "../../lib/repositories/albums";
 
 const cx = classnames.bind(localStyle);
 
 function AlbumsPage() {
+  const albums = getAllAlbums();
+
   return (
     <main className={cx("page-main")}>
       <PageHero
@@ -17,8 +19,8 @@ function AlbumsPage() {
       <section className={cx("section")}>
         <div className={cx("section-inner")}>
           <div className={cx("album-grid")}>
-            {siteData.latestAlbums.map((album) => (
-              <AlbumCard key={album.id} album={album} />
+            {albums.map((album) => (
+              <AlbumCard key={album.slug} album={album} />
             ))}
           </div>
         </div>

@@ -9,14 +9,19 @@ import localStyle from './index.module.css';
 import AlbumCard from '../../components/AlbumCard';
 import SectionHeader from '../../components/SectionHeader';
 import TextLink from '../../components/TextLink';
-import siteData from '../../data/siteData';
+import type { SiteData } from '../../data/siteData';
 
 const cx = classnames.bind(localStyle);
 const IMAGE_SLIDE_DURATION = 5.2;
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-function HomePage() {
+interface HomePageProps {
+  siteData: SiteData;
+}
+
+function HomePage(props: HomePageProps) {
+  const { siteData } = props;
   const pageRef = useRef<HTMLElement | null>(null);
   const heroRef = useRef<HTMLElement | null>(null);
   const videoRefs = useRef<Record<number, HTMLVideoElement | null>>({});
@@ -30,7 +35,7 @@ function HomePage() {
 
   const goToNextSlide = useCallback(() => {
     setActiveSlide((current) => (current + 1) % siteData.heroSlides.length);
-  }, []);
+  }, [siteData.heroSlides.length]);
 
   useGSAP(
     () => {
@@ -220,14 +225,14 @@ function HomePage() {
     return () => {
       imageProgressTweenRef.current?.kill();
     };
-  }, [activeSlide, goToNextSlide]);
+  }, [activeSlide, goToNextSlide, siteData.heroSlides]);
 
   return (
     <main ref={pageRef}>
       <section ref={heroRef} className={cx('hero')} aria-label="照片轮播">
         {siteData.heroSlides.map((slide, index) => (
           <article
-            key={slide.title}
+            key={slide.id}
             className={cx('hero-slide', { 'is-active': index === activeSlide })}
             data-hero-slide
           >
@@ -237,15 +242,15 @@ function HomePage() {
                   videoRefs.current[index] = element;
                 }}
                 data-hero-media
-                src={slide.videoUrl}
-                poster={slide.posterImageUrl}
+                src={slide.video_url ?? ''}
+                poster={slide.video_poster_url ?? ''}
                 muted
                 playsInline
                 preload="metadata"
-                aria-label={slide.imageAlt}
+                aria-label={slide.caption ?? ''}
               />
             ) : (
-              <img data-hero-media src={slide.imageUrl} alt={slide.imageAlt} />
+              <img data-hero-media src={slide.image_url ?? ''} alt={(slide.image_alt ?? slide.caption) ?? ''} />
             )}
             <div className={cx('hero-copy')}>
               <p className={cx('eyebrow')} data-hero-copy-item>
@@ -257,7 +262,7 @@ function HomePage() {
           </article>
         ))}
         <div
-          className={cx('hero-progress', { 'is-visible': siteData.heroSlides[activeSlide].type === 'video' })}
+          className={cx('hero-progress', { 'is-visible': siteData.heroSlides[activeSlide]?.type === 'video' })}
           aria-hidden="true"
         >
           <span style={{ transform: `scaleX(${slideProgress})` }} />
@@ -265,7 +270,7 @@ function HomePage() {
         <div className={cx('hero-dots')} aria-label="轮播控制">
           {siteData.heroSlides.map((slide, index) => (
             <button
-              key={slide.title}
+              key={slide.id}
               type="button"
               className={cx({ 'is-active': index === activeSlide })}
               aria-label={`查看第 ${index + 1} 张照片`}
@@ -283,7 +288,7 @@ function HomePage() {
           </div>
           <div className={cx('album-grid')}>
             {siteData.latestAlbums.map((album) => (
-              <div key={album.id} data-latest-motion>
+              <div key={album.slug} data-latest-motion>
                 <AlbumCard album={album} />
               </div>
             ))}
@@ -298,9 +303,9 @@ function HomePage() {
           </div>
           <div className={cx('feature-list')}>
             {siteData.featuredPhotos.map((photo, index) => (
-              <article key={photo.title} className={cx('feature-item')} data-featured-motion style={{ zIndex: index + 1 }}>
+              <article key={photo.id} className={cx('feature-item')} data-featured-motion style={{ zIndex: index + 1 }}>
                 <div className={cx('feature-image')}>
-                  <img src={photo.imageUrl} alt={photo.imageAlt} loading="lazy" />
+                  <img src={photo.image_url} alt={photo.image_alt ?? ''} loading="lazy" />
                 </div>
                 <div className={cx('feature-copy')}>
                   <p className={cx('album-meta')}>

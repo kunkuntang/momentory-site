@@ -25,16 +25,33 @@ function Header(props: IHeaderProps) {
         <span className={cx('brand-name')}>{siteName}</span>
       </Link>
       <nav className={cx('site-nav')} aria-label="主导航">
-        {navigation.map((item) => (
-          <Link
-            key={item.url}
-            className={cx({ active: pathname === item.url })}
-            href={item.url}
-            aria-current={pathname === item.url ? 'page' : undefined}
-          >
-            {item.label}
-          </Link>
-        ))}
+        {navigation.map((item) => {
+          const isActive = pathname === item.url;
+          if (item.linkType === 'inner') {
+            return (
+              <Link
+                key={item.url}
+                className={cx({ active: isActive })}
+                href={item.url}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {item.label}
+              </Link>
+            );
+          }
+          return (
+            <a
+              key={item.url}
+              className={cx({ active: isActive })}
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-current={isActive ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          );
+        })}
       </nav>
     </header>
   );

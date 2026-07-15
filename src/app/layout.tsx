@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import '../styles/global.css';
 import Layout from '../components/Layout';
-import siteData from '../data/siteData';
+import { getSiteData } from '../data/siteData';
+
+const siteData = getSiteData();
 
 export const metadata: Metadata = {
   title: siteData.site.name,
@@ -17,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body>
-        <Layout>{children}</Layout>
+        <Layout siteData={siteData}>{children}</Layout>
       </body>
     </html>
   );

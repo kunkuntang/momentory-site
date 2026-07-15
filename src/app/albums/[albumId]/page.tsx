@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import AlbumDetailPage from '../../../views/AlbumDetailPage';
-import { findAlbumById } from '../../../data/siteData';
+import { getAlbumBySlug } from '../../../lib/repositories/albums';
 
 interface IAlbumPageProps {
   params: Promise<{
@@ -10,7 +10,7 @@ interface IAlbumPageProps {
 
 export default async function Page(props: IAlbumPageProps) {
   const { albumId } = await props.params;
-  const album = findAlbumById(albumId);
+  const album = getAlbumBySlug(albumId);
 
   if (!album) {
     redirect('/albums');
