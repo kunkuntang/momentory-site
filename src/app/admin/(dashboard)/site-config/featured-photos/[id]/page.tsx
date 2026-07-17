@@ -13,7 +13,7 @@ interface EditFeaturedPhotoPageProps {
 
 export default async function EditFeaturedPhotoPage({ params }: EditFeaturedPhotoPageProps) {
   const { id } = await params;
-  const photo = getFeaturedPhotoById(Number(id));
+  const photo = await getFeaturedPhotoById(Number(id));
   if (!photo) notFound();
 
   return (

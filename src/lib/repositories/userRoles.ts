@@ -1,83 +1,58 @@
-import db from '../database';
+import prisma from '../prisma';
+import type { UserRole } from '../../../prisma/generated/client/client';
 
-export interface UserRole {
-  id: number;
-  name: string;
-  description: string | null;
-  permissions: string;
-  created_at: string;
-  updated_at: string;
-}
+export type UserRoleWithCount = UserRole & { user_count: number };
 
-export interface UserRoleWithCount extends UserRole {
-  user_count: number;
-}
-
-export function getAllRoles(): UserRoleWithCount[] {
-  const stmt = db.prepare(`
+export async function getAllRoles(): Promise<UserRoleWithCount[]> {
+  return await prisma.$queryRaw`
     SELECT r.*, COUNT(u.id) as user_count
     FROM user_roles r
     LEFT JOIN users u ON r.id = u.role_id
     GROUP BY r.id
     ORDER BY r.id ASC
-  `);
-  return stmt.all() as UserRoleWithCount[];
+  `;
 }
 
-export function getRoleById(id: number): UserRole | null {
-  const stmt = db.prepare(`SELECT * FROM user_roles WHERE id = ?`);
-  return (stmt.get(id) as UserRole) || null;
+export async function getRoleById(id: number): Promise<UserRole | null> {
+  return await prisma.userRole.findUnique({ where: { id } });
 }
 
-export function createRole(data: {
+export async function createRole(data: {
   name: string;
   description?: string;
   permissions: string;
-}): UserRole {
-  const stmt = db.prepare(`
-    INSERT INTO user_roles (name, description, permissions)
-    VALUES (?, ?, ?)
-  `);
-  const result = stmt.run(data.name, data.description ?? null, data.permissions);
-  return getRoleById(result.lastInsertRowid as number) as UserRole;
+}): Promise<UserRole> {
+  return await prisma.userRole.create({
+    data: {
+      name: data.name,
+      description: data.description ?? null,
+      permissions: data.permissions,
+    },
+  });
 }
 
-export function updateRole(
+export async function updateRole(
   id: number,
   data: { name?: string; description?: string; permissions?: string },
-): void {
-  const fields: string[] = [];
-  const values: (string | null)[] = [];
-
-  if (data.name !== undefined) {
-    fields.push('name = ?');
-    values.push(data.name);
-  }
-  if (data.description !== undefined) {
-    fields.push('description = ?');
-    values.push(data.description);
-  }
-  if (data.permissions !== undefined) {
-    fields.push('permissions = ?');
-    values.push(data.permissions);
-  }
-
-  if (fields.length === 0) return;
-
-  fields.push('updated_at = CURRENT_TIMESTAMP');
-  values.push(String(id));
-
-  const stmt = db.prepare(`UPDATE user_roles SET ${fields.join(', ')} WHERE id = ?`);
-  stmt.run(...values);
+): Promise<void> {
+  await prisma.userRole.update({
+    where: { id },
+    data: {
+      ...(data.name !== undefined && { name: data.name }),
+      ...(data.description !== undefined && { description: data.description ?? null }),
+      ...(data.permissions !== undefined && { permissions: data.permissions }),
+      updated_at: new Date(),
+    },
+  });
 }
 
-export function deleteRole(id: number): void {
-  const stmt = db.prepare(`DELETE FROM user_roles WHERE id = ?`);
-  stmt.run(id);
+export async function deleteRole(id: number): Promise<void> {
+  await prisma.userRole.delete({ where: { id } });
 }
 
-export function countUsersByRole(roleId: number): number {
-  const stmt = db.prepare(`SELECT COUNT(*) as count FROM users WHERE role_id = ?`);
-  const result = stmt.get(roleId) as { count: number };
-  return result.count;
+export async function countUsersByRole(roleId: number): Promise<number> {
+  const result = await prisma.$queryRaw<{ count: number }[]>`
+    SELECT COUNT(*) as count FROM users WHERE role_id = ${roleId}
+  `;
+  return result[0]?.count ?? 0;
 }

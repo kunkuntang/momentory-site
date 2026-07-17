@@ -18,7 +18,7 @@ export async function loginAction(prevState: LoginState | undefined, formData: F
     return { error: '请输入用户名和密码' };
   }
 
-  const user = getUserByUsername(username);
+  const user = await getUserByUsername(username);
   if (!user) {
     return { error: '用户名或密码错误' };
   }
@@ -32,7 +32,7 @@ export async function loginAction(prevState: LoginState | undefined, formData: F
     return { error: '用户名或密码错误' };
   }
 
-  const role = getRoleById(user.role_id);
+  const role = await getRoleById(user.role_id);
   if (!role) {
     return { error: '用户角色不存在' };
   }
@@ -47,7 +47,7 @@ export async function loginAction(prevState: LoginState | undefined, formData: F
   });
 
   await setSessionCookie(token);
-  updateLastLogin(user.id);
+  await updateLastLogin(user.id);
 
   redirect('/admin');
 }

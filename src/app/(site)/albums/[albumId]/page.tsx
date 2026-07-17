@@ -10,7 +10,7 @@ interface IAlbumPageProps {
 
 export default async function Page(props: IAlbumPageProps) {
   const { albumId } = await props.params;
-  const album = getAlbumBySlug(albumId);
+  const album = await getAlbumBySlug(albumId);
 
   if (!album) {
     redirect('/albums');

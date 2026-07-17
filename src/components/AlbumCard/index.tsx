@@ -13,9 +13,9 @@ interface IAlbumCardProps {
 function AlbumCard(props: IAlbumCardProps) {
   const { album } = props;
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  const formatDate = (date: Date | string) => {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   };
 
   return (

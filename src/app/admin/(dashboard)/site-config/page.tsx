@@ -4,11 +4,11 @@ import { getAllFeaturedPhotos } from '@/lib/repositories/featuredPhotos';
 import { getAllCarouselItems } from '@/lib/repositories/homeCarousel';
 import PageHeader from '@/components/admin/PageHeader';
 
-export default function SiteConfigPage() {
-  const siteInfo = getSiteInfo();
-  const menuCount = getAllMenuItems().length;
-  const featuredPhotoCount = getAllFeaturedPhotos().length;
-  const carouselCount = getAllCarouselItems().length;
+export default async function SiteConfigPage() {
+  const siteInfo = await getSiteInfo();
+  const menuItems = await getAllMenuItems();
+  const featuredPhotos = await getAllFeaturedPhotos();
+  const carouselItems = await getAllCarouselItems();
 
   const cards = [
     {
@@ -19,17 +19,17 @@ export default function SiteConfigPage() {
     {
       title: '导航菜单',
       href: '/admin/site-config/menu',
-      description: `共 ${menuCount} 个菜单项`,
+      description: `共 ${menuItems.length} 个菜单项`,
     },
     {
       title: '精选照片',
       href: '/admin/site-config/featured-photos',
-      description: `共 ${featuredPhotoCount} 条精选照片`,
+      description: `共 ${featuredPhotos.length} 条精选照片`,
     },
     {
       title: '首页轮播',
       href: '/admin/site-config/carousel',
-      description: `共 ${carouselCount} 条轮播内容`,
+      description: `共 ${carouselItems.length} 条轮播内容`,
     },
   ];
 

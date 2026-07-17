@@ -14,11 +14,11 @@ interface EditPhotoPageProps {
 
 export default async function EditPhotoPage({ params }: EditPhotoPageProps) {
   const { id } = await params;
-  const photo = getPhotoById(Number(id));
+  const photo = await getPhotoById(Number(id));
   if (!photo) notFound();
 
-  const albums = getAllAlbums();
-  const categories = getAllCategories();
+  const albums = await getAllAlbums();
+  const categories = await getAllCategories();
 
   return (
     <div>

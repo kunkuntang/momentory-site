@@ -13,7 +13,7 @@ interface EditMenuItemPageProps {
 
 export default async function EditMenuItemPage({ params }: EditMenuItemPageProps) {
   const { id } = await params;
-  const item = getMenuItemById(Number(id));
+  const item = await getMenuItemById(Number(id));
   if (!item) notFound();
 
   return (

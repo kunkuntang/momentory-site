@@ -17,7 +17,7 @@ export async function createAlbumAction(formData: FormData) {
     redirect('/admin/albums/new?error=missing');
   }
 
-  createAlbum({
+  await createAlbum({
     slug,
     title,
     summary: summary || undefined,
@@ -39,7 +39,7 @@ export async function updateAlbumAction(formData: FormData) {
   const coverImageAlt = formData.get('cover_image_alt') as string;
   const isPrivate = formData.get('is_private') === 'on';
 
-  updateAlbum(id, {
+  await updateAlbum(id, {
     slug,
     title,
     summary: summary || undefined,
@@ -54,6 +54,6 @@ export async function updateAlbumAction(formData: FormData) {
 export async function deleteAlbumAction(formData: FormData) {
   await requireAuth();
   const id = Number(formData.get('id'));
-  deleteAlbum(id);
+  await deleteAlbum(id);
   redirect('/admin/albums');
 }

@@ -14,10 +14,10 @@ interface EditUserPageProps {
 
 export default async function EditUserPage({ params }: EditUserPageProps) {
   const { id } = await params;
-  const user = getUserById(Number(id));
+  const user = await getUserById(Number(id));
   if (!user) notFound();
 
-  const roles = getAllRoles();
+  const roles = await getAllRoles();
   const isSuperAdmin = user.username === 'cb_mome_root';
 
   return (

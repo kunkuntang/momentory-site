@@ -1,107 +1,69 @@
-import db from '../database';
-
-export interface SiteInfo {
-  name: string;
-  logo_text: string;
-  tagline: string;
-  copyright: string;
-}
+import prisma from '../prisma';
+import type { SiteConfig, Menu } from '../../../prisma/generated/client/client';
 
 export type LinkType = 'inner' | 'outer' | 'mini_program' | 'universal_app' | 'android_app' | 'apple_app';
 
-export interface MenuItem {
-  id: number;
-  label: string;
-  url: string;
-  link_type: LinkType;
-  sort_order: number;
-  is_active: number;
+export type MenuItem = Menu;
+
+export async function getSiteInfo(): Promise<{ name: string; logo_text: string; tagline: string; copyright: string }> {
+  const config = await prisma.siteConfig.findFirst({
+    select: { name: true, logo_text: true, tagline: true, copyright: true },
+  });
+  return config || { name: '', logo_text: '', tagline: '', copyright: '' };
 }
 
-export function getSiteInfo(): SiteInfo {
-  const stmt = db.prepare(`
-    SELECT name, logo_text, tagline, copyright FROM site_config LIMIT 1
-  `);
-  return stmt.get() as SiteInfo;
+export async function getMenuItems(): Promise<MenuItem[]> {
+  return await prisma.menu.findMany({
+    where: { is_active: true },
+    orderBy: { sort_order: 'asc' },
+  });
 }
 
-export function getMenuItems(): MenuItem[] {
-  const stmt = db.prepare(`
-    SELECT id, label, url, link_type, sort_order, is_active FROM menu
-    WHERE is_active = 1
-    ORDER BY sort_order ASC
-  `);
-  return stmt.all() as MenuItem[];
-}
-
-export function updateSiteConfig(
+export async function updateSiteConfig(
   id: number,
   data: { name?: string; logo_text?: string; tagline?: string; copyright?: string },
-): void {
-  const fields: string[] = [];
-  const values: string[] = [];
-
-  if (data.name !== undefined) {
-    fields.push('name = ?');
-    values.push(data.name);
-  }
-  if (data.logo_text !== undefined) {
-    fields.push('logo_text = ?');
-    values.push(data.logo_text);
-  }
-  if (data.tagline !== undefined) {
-    fields.push('tagline = ?');
-    values.push(data.tagline);
-  }
-  if (data.copyright !== undefined) {
-    fields.push('copyright = ?');
-    values.push(data.copyright);
-  }
-
-  if (fields.length === 0) return;
-
-  fields.push('updated_at = CURRENT_TIMESTAMP');
-  values.push(String(id));
-
-  const stmt = db.prepare(`UPDATE site_config SET ${fields.join(', ')} WHERE id = ?`);
-  stmt.run(...values);
+): Promise<void> {
+  await prisma.siteConfig.update({
+    where: { id },
+    data: {
+      ...(data.name !== undefined && { name: data.name }),
+      ...(data.logo_text !== undefined && { logo_text: data.logo_text }),
+      ...(data.tagline !== undefined && { tagline: data.tagline }),
+      ...(data.copyright !== undefined && { copyright: data.copyright }),
+      updated_at: new Date(),
+    },
+  });
 }
 
-export function getAllMenuItems(): MenuItem[] {
-  const stmt = db.prepare(`
-    SELECT id, label, url, link_type, sort_order, is_active FROM menu
-    ORDER BY sort_order ASC
-  `);
-  return stmt.all() as MenuItem[];
+export async function getAllMenuItems(): Promise<MenuItem[]> {
+  return await prisma.menu.findMany({
+    orderBy: { sort_order: 'asc' },
+  });
 }
 
-export function getMenuItemById(id: number): MenuItem | null {
-  const stmt = db.prepare(`SELECT * FROM menu WHERE id = ?`);
-  return (stmt.get(id) as MenuItem) || null;
+export async function getMenuItemById(id: number): Promise<MenuItem | null> {
+  return await prisma.menu.findUnique({ where: { id } });
 }
 
-export function createMenuItem(data: {
+export async function createMenuItem(data: {
   label: string;
   url: string;
   link_type?: string;
   sort_order?: number;
   is_active?: boolean;
-}): MenuItem {
-  const stmt = db.prepare(`
-    INSERT INTO menu (label, url, link_type, sort_order, is_active)
-    VALUES (?, ?, ?, ?, ?)
-  `);
-  const result = stmt.run(
-    data.label,
-    data.url,
-    data.link_type ?? 'inner',
-    data.sort_order ?? 0,
-    data.is_active === false ? 0 : 1,
-  );
-  return getMenuItemById(result.lastInsertRowid as number) as MenuItem;
+}): Promise<MenuItem> {
+  return await prisma.menu.create({
+    data: {
+      label: data.label,
+      url: data.url,
+      link_type: (data.link_type ?? 'inner') as LinkType,
+      sort_order: data.sort_order ?? 0,
+      is_active: data.is_active ?? true,
+    },
+  });
 }
 
-export function updateMenuItem(
+export async function updateMenuItem(
   id: number,
   data: {
     label?: string;
@@ -110,40 +72,19 @@ export function updateMenuItem(
     sort_order?: number;
     is_active?: boolean;
   },
-): void {
-  const fields: string[] = [];
-  const values: (string | number)[] = [];
-
-  if (data.label !== undefined) {
-    fields.push('label = ?');
-    values.push(data.label);
-  }
-  if (data.url !== undefined) {
-    fields.push('url = ?');
-    values.push(data.url);
-  }
-  if (data.link_type !== undefined) {
-    fields.push('link_type = ?');
-    values.push(data.link_type);
-  }
-  if (data.sort_order !== undefined) {
-    fields.push('sort_order = ?');
-    values.push(data.sort_order);
-  }
-  if (data.is_active !== undefined) {
-    fields.push('is_active = ?');
-    values.push(data.is_active ? 1 : 0);
-  }
-
-  if (fields.length === 0) return;
-
-  values.push(id);
-
-  const stmt = db.prepare(`UPDATE menu SET ${fields.join(', ')} WHERE id = ?`);
-  stmt.run(...values);
+): Promise<void> {
+  await prisma.menu.update({
+    where: { id },
+    data: {
+      ...(data.label !== undefined && { label: data.label }),
+      ...(data.url !== undefined && { url: data.url }),
+      ...(data.link_type !== undefined && { link_type: data.link_type as LinkType }),
+      ...(data.sort_order !== undefined && { sort_order: data.sort_order }),
+      ...(data.is_active !== undefined && { is_active: data.is_active }),
+    },
+  });
 }
 
-export function deleteMenuItem(id: number): void {
-  const stmt = db.prepare(`DELETE FROM menu WHERE id = ?`);
-  stmt.run(id);
+export async function deleteMenuItem(id: number): Promise<void> {
+  await prisma.menu.delete({ where: { id } });
 }

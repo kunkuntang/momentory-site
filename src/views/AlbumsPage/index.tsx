@@ -6,8 +6,8 @@ import { getAllAlbums } from "../../lib/repositories/albums";
 
 const cx = classnames.bind(localStyle);
 
-function AlbumsPage() {
-  const albums = getAllAlbums();
+async function AlbumsPage() {
+  const albums = await getAllAlbums();
 
   return (
     <main className={cx("page-main")}>

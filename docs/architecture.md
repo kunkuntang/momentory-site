@@ -2,7 +2,7 @@
 
 ## 概述
 
-Momentory 是一个基于 Next.js 构建的相册展示网站，采用服务端渲染（SSR）与客户端交互相结合的方式，数据存储于 SQLite 数据库，通过 Repository 模式进行数据访问。项目遵循清晰的分层架构，代码组织严谨，便于维护和扩展。
+Momentory 是一个基于 Next.js 构建的相册展示网站，采用服务端渲染（SSR）与客户端交互相结合的方式，数据存储于 MySQL 8.0 数据库，通过 Repository 模式进行异步数据访问。项目遵循清晰的分层架构，代码组织严谨，便于维护和扩展。
 
 ## 架构总览
 
@@ -45,7 +45,7 @@ Momentory 是一个基于 Next.js 构建的相册展示网站，采用服务端�
 │                                ▼                                         │
 │  ┌────────────────────────────────────────────────────────────────────┐  │
 │  │                        Database Layer                              │  │
-│  │                     SQLite (better-sqlite3)                        │  │
+│  │                   MySQL 8.0 (mysql2/promise)                       │  │
 │  └────────────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
@@ -56,7 +56,6 @@ Momentory 是一个基于 Next.js 构建的相册展示网站，采用服务端�
 
 | 目录/文件 | 作用 | 说明 |
 | --------- | ---- | ---- |
-| `db/` | 数据库文件目录 | 存放 SQLite 数据库文件，仅服务端可访问 |
 | `sql/` | SQL 脚本目录 | 存放数据库初始化脚本 |
 | `src/` | 源代码目录 | 项目核心代码 |
 | `docs/` | 文档目录 | 项目文档（技术栈、数据库设计、架构） |
@@ -66,19 +65,6 @@ Momentory 是一个基于 Next.js 构建的相册展示网站，采用服务端�
 | `package.json` | 项目依赖配置 | 包含脚本命令和依赖声明 |
 | `tmc.config.js` | 腾讯云部署配置 | tmc-cli 部署到腾讯云 COS 的配置文件 |
 | `cb.config.js` | 构建配置 | 前端构建工具的配置文件 |
-
-### db/ - 数据库文件目录
-
-```
-db/
-├── momentory.sqlite      # SQLite 数据库主文件
-├── momentory.sqlite-shm  # SQLite 共享内存文件（WAL 模式）
-└── momentory.sqlite-wal  # SQLite 预写日志文件（WAL 模式）
-```
-
-- **职责**: 存储应用所有持久化数据
-- **特点**: 使用 WAL (Write-Ahead Logging) 模式提升并发读写性能
-- **访问方式**: 通过 `src/lib/database.ts` 统一管理，仅服务端操作
 
 ### sql/ - SQL 脚本目录
 
@@ -114,7 +100,7 @@ src/app/
 - **特性**: 
   - `layout.tsx`: 全局布局，加载全局样式，获取站点数据
   - 动态路由 `[albumId]`: 支持通过相册别名访问详情页
-  - 页面组件直接调用 `getSiteData()` 获取数据
+  - 页面组件直接调用 `getSiteData()` 获取数据（异步）
 
 #### src/components/ - 可复用组件
 
@@ -168,8 +154,8 @@ src/data/
 
 - **职责**: 聚合所有数据源，提供统一的数据访问接口
 - **核心功能**: 
-  - `getSiteData()`: 获取完整的站点数据对象
-  - `findAlbumById()`: 根据 ID/别名查找相册
+  - `getSiteData()`: 获取完整的站点数据对象（异步）
+  - `findAlbumById()`: 根据 ID/别名查找相册（异步）
 - **数据来源**: 
   - 从 Repository 层获取数据库数据
   - 部分静态数据（如 profile、about）暂硬编码
@@ -179,7 +165,7 @@ src/data/
 
 ```
 src/lib/
-├── database.ts           # 数据库连接封装
+├── database.ts           # 数据库连接封装（MySQL 连接池）
 └── repositories/
     ├── albums.ts         # 相册数据访问
     ├── featuredPhotos.ts # 精选照片数据访问
@@ -189,24 +175,25 @@ src/lib/
 
 **database.ts**
 
-- **职责**: 初始化和管理 SQLite 数据库连接
+- **职责**: 初始化和管理 MySQL 数据库连接池
 - **配置**: 
-  - 启用 WAL 模式
-  - 启用外键约束
-  - 开发环境开启 verbose 日志
-- **导出**: 单例数据库实例 `db`
+  - 字符集: `utf8mb4`
+  - 排序规则: `utf8mb4_unicode_ci`
+  - 存储引擎: InnoDB
+  - 连接池: 最大连接数 10
+- **导出**: `prepare`, `exec`, `close` 方法
 
 **repositories/**
 
 - **职责**: 实现数据访问层（Repository 模式）
 - **设计原则**: 
   - 每个 Repository 对应一个或一组相关数据表
-  - 封装 SQL 查询逻辑，提供类型安全的 API
+  - 封装 SQL 查询逻辑，提供类型安全的异步 API
   - 仅在服务端执行，确保数据库安全
 - **示例接口**: 
-  - `getAllAlbums()`: 获取所有相册
-  - `getAlbumBySlug(slug)`: 按别名获取相册（含照片）
-  - `getActiveCarouselItems()`: 获取启用的轮播图
+  - `getAllAlbums()`: 获取所有相册（异步）
+  - `getAlbumBySlug(slug)`: 按别名获取相册（含照片）（异步）
+  - `getActiveCarouselItems()`: 获取启用的轮播图（异步）
 
 #### src/scripts/ - 脚本目录
 
@@ -218,7 +205,7 @@ src/scripts/
 - **职责**: 执行数据库初始化逻辑
 - **功能**: 
   - 读取 `sql/init.sql` 脚本
-  - 执行建表和数据插入操作
+  - 执行建表和数据插入操作（异步）
 - **执行**: 通过 `pnpm run init-db` 命令调用
 
 #### src/styles/ - 全局样式
@@ -248,18 +235,18 @@ src/types/
 ## 数据流向
 
 ```
-数据库 (SQLite)
+数据库 (MySQL 8.0)
      │
      ▼
 ┌──────────────────────┐
 │   Repository Layer   │  ← src/lib/repositories/
-│   (数据访问层)        │
+│   (数据访问层 - 异步)   │
 └──────────────────────┘
      │
      ▼
 ┌──────────────────────┐
 │     Data Layer       │  ← src/data/siteData.ts
-│   (数据聚合层)        │
+│   (数据聚合层 - 异步)   │
 └──────────────────────┘
      │
      ▼
@@ -286,11 +273,10 @@ src/types/
 
 | 目录/文件 | 职责 |
 | --------- | ---- |
-| `src/lib/repositories/` | 数据库访问层，封装 SQL 查询 |
-| `src/lib/database.ts` | 数据库连接管理 |
-| `src/data/siteData.ts` | 数据聚合，调用 Repository 获取数据 |
+| `src/lib/repositories/` | 数据库访问层，封装 SQL 查询（异步） |
+| `src/lib/database.ts` | MySQL 连接池管理 |
+| `src/data/siteData.ts` | 数据聚合，调用 Repository 获取数据（异步） |
 | `src/scripts/` | 数据库初始化脚本 |
-| `db/` | SQLite 数据库文件 |
 
 **客户端区域（在浏览器执行）：**
 
@@ -303,7 +289,7 @@ src/types/
 **边界规则：**
 
 - **禁止**在客户端组件中直接导入 Repository 或 database.ts
-- **数据获取**必须通过 `getSiteData()` 在服务端完成，然后通过 props 传递给客户端组件
+- **数据获取**必须通过 `await getSiteData()` 在服务端完成，然后通过 props 传递给客户端组件
 - **动画和交互**逻辑在客户端组件中实现（GSAP、状态管理）
 - **页面路由**默认在服务端渲染，确保首屏加载速度和 SEO
 
@@ -311,7 +297,7 @@ src/types/
 
 ### 1. Repository 模式
 
-- **目的**: 封装数据访问逻辑，提供类型安全的接口
+- **目的**: 封装数据访问逻辑，提供类型安全的异步接口
 - **实现**: 每个数据表对应一个 Repository 文件
 - **优点**: 
   - 降低数据访问与业务逻辑的耦合
@@ -321,7 +307,7 @@ src/types/
 ### 2. 数据聚合模式
 
 - **目的**: 将多个数据源聚合为统一的数据对象
-- **实现**: `siteData.ts` 作为数据聚合中心
+- **实现**: `siteData.ts` 作为数据聚合中心（异步）
 - **优点**: 
   - 页面组件只需调用一个函数即可获取所有数据
   - 数据结构统一，便于维护
@@ -351,10 +337,10 @@ src/types/
   - Repository 文件不导出到客户端组件
   - 使用 Next.js App Router 默认的服务端执行环境
 
-### 文件访问控制
+### 环境变量管理
 
-- **规则**: 数据库文件位于 `db/` 目录，不对外暴露
-- **实现**: 通过 `.gitignore` 排除敏感文件
+- **规则**: 数据库连接信息（用户名、密码、主机）通过环境变量配置
+- **实现**: `.env.local` 文件存放敏感配置，通过 `.gitignore` 排除
 
 ### 私有相册保护
 
@@ -370,8 +356,8 @@ src/types/
 
 ### 数据库优化
 
-- **策略**: SQLite WAL 模式 + 索引优化
-- **效果**: 提升并发读写性能
+- **策略**: MySQL 连接池 + 索引优化 + InnoDB 存储引擎
+- **效果**: 提升并发读写性能，支持事务
 
 ### 图片优化
 
@@ -395,8 +381,8 @@ src/types/
 
 Momentory 项目采用了清晰的分层架构设计：
 
-1. **数据层**: 通过 Repository 模式封装数据库访问，确保数据操作的安全性和可维护性
-2. **业务层**: 通过 `siteData.ts` 聚合数据，提供统一的数据接口
+1. **数据层**: 通过 Repository 模式封装 MySQL 数据库访问（异步），确保数据操作的安全性和可维护性
+2. **业务层**: 通过 `siteData.ts` 聚合数据，提供统一的异步数据接口
 3. **视图层**: 分离 Views 和 Components，实现关注点分离
 4. **样式层**: 使用 CSS Modules 实现样式隔离
 

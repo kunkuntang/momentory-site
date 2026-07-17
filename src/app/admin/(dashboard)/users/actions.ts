@@ -22,7 +22,7 @@ export async function createUserAction(formData: FormData) {
   }
 
   const hash = hashPassword(password);
-  createUser({
+  await createUser({
     username,
     password_hash: hash,
     role_id: roleId,
@@ -40,14 +40,14 @@ export async function updateUserAction(formData: FormData) {
   const isActive = formData.get('is_active') === 'on';
   const newPassword = formData.get('password') as string;
 
-  updateUser(id, {
+  await updateUser(id, {
     username,
     role_id: roleId,
     is_active: isActive,
   });
 
   if (newPassword) {
-    updateUserPassword(id, hashPassword(newPassword));
+    await updateUserPassword(id, hashPassword(newPassword));
   }
 
   redirect('/admin/users');
@@ -56,6 +56,6 @@ export async function updateUserAction(formData: FormData) {
 export async function deleteUserAction(formData: FormData) {
   await requireAuth();
   const id = Number(formData.get('id'));
-  deleteUser(id);
+  await deleteUser(id);
   redirect('/admin/users');
 }

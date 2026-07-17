@@ -35,12 +35,12 @@ export interface SiteData {
   };
 }
 
-export function getSiteData(): SiteData {
-  const siteInfo = getSiteInfo();
-  const menuItems = getMenuItems();
-  const carouselItems = getActiveCarouselItems();
-  const albums = getAllAlbums();
-  const featured = getActiveFeaturedPhotos();
+export async function getSiteData(): Promise<SiteData> {
+  const siteInfo = await getSiteInfo();
+  const menuItems = await getMenuItems();
+  const carouselItems = await getActiveCarouselItems();
+  const albums = await getAllAlbums();
+  const featured = await getActiveFeaturedPhotos();
 
   return {
     site: {
@@ -80,8 +80,8 @@ export type AlbumPhoto = Photo;
 export type FeaturePhoto = FeaturedPhoto;
 export type NavigationItem = SiteData['navigation'][number];
 
-export function findAlbumById(albumId: string): AlbumWithPhotos | null {
-  return getAlbumBySlug(albumId);
+export async function findAlbumById(albumId: string): Promise<AlbumWithPhotos | null> {
+  return await getAlbumBySlug(albumId);
 }
 
 export default getSiteData;

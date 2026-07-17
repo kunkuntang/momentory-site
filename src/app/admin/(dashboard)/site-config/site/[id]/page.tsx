@@ -11,7 +11,7 @@ interface EditSiteConfigPageProps {
 
 export default async function EditSiteConfigPage({ params }: EditSiteConfigPageProps) {
   const { id } = await params;
-  const siteInfo = getSiteInfo();
+  const siteInfo = await getSiteInfo();
 
   return (
     <div>

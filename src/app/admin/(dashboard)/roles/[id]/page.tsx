@@ -33,7 +33,7 @@ interface EditRolePageProps {
 
 export default async function EditRolePage({ params }: EditRolePageProps) {
   const { id } = await params;
-  const role = getRoleById(Number(id));
+  const role = await getRoleById(Number(id));
   if (!role) notFound();
 
   const isSuperAdmin = role.name === 'super_admin';

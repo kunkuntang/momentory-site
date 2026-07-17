@@ -4,8 +4,8 @@ import PageHeader from '@/components/admin/PageHeader';
 import DataTable, { type Column } from '@/components/admin/DataTable';
 import type { FeaturedPhoto } from '@/lib/repositories/featuredPhotos';
 
-export default function FeaturedPhotosPage() {
-  const photos = getAllFeaturedPhotos();
+export default async function FeaturedPhotosPage() {
+  const photos = await getAllFeaturedPhotos();
 
   const columns: Column<FeaturedPhoto>[] = [
     { key: 'id', label: 'ID', className: 'w-12' },

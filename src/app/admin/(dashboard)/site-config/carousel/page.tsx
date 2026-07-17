@@ -4,8 +4,8 @@ import PageHeader from '@/components/admin/PageHeader';
 import DataTable, { type Column } from '@/components/admin/DataTable';
 import type { HomeCarouselItem } from '@/lib/repositories/homeCarousel';
 
-export default function CarouselPage() {
-  const items = getAllCarouselItems();
+export default async function CarouselPage() {
+  const items = await getAllCarouselItems();
 
   const columns: Column<HomeCarouselItem>[] = [
     { key: 'id', label: 'ID', className: 'w-12' },

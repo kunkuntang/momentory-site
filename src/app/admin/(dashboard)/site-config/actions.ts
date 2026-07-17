@@ -20,7 +20,6 @@ import {
   deleteCarouselItem,
 } from '@/lib/repositories/homeCarousel';
 
-// ===== Site Config =====
 export async function updateSiteConfigAction(formData: FormData) {
   await requireAuth();
   const id = Number(formData.get('id'));
@@ -29,11 +28,10 @@ export async function updateSiteConfigAction(formData: FormData) {
   const tagline = formData.get('tagline') as string;
   const copyright = formData.get('copyright') as string;
 
-  updateSiteConfig(id, { name, logo_text: logoText, tagline, copyright });
+  await updateSiteConfig(id, { name, logo_text: logoText, tagline, copyright });
   redirect('/admin/site-config');
 }
 
-// ===== Menu =====
 export async function createMenuItemAction(formData: FormData) {
   await requireAuth();
   const label = formData.get('label') as string;
@@ -46,7 +44,7 @@ export async function createMenuItemAction(formData: FormData) {
     redirect('/admin/site-config/menu/new?error=missing');
   }
 
-  createMenuItem({
+  await createMenuItem({
     label,
     url,
     link_type: linkType || 'inner',
@@ -66,7 +64,7 @@ export async function updateMenuItemAction(formData: FormData) {
   const sortOrder = Number(formData.get('sort_order')) || 0;
   const isActive = formData.get('is_active') === 'on';
 
-  updateMenuItem(id, {
+  await updateMenuItem(id, {
     label,
     url,
     link_type: linkType || 'inner',
@@ -80,11 +78,10 @@ export async function updateMenuItemAction(formData: FormData) {
 export async function deleteMenuItemAction(formData: FormData) {
   await requireAuth();
   const id = Number(formData.get('id'));
-  deleteMenuItem(id);
+  await deleteMenuItem(id);
   redirect('/admin/site-config/menu');
 }
 
-// ===== Featured Photos =====
 export async function createFeaturedPhotoAction(formData: FormData) {
   await requireAuth();
   const title = formData.get('title') as string;
@@ -100,7 +97,7 @@ export async function createFeaturedPhotoAction(formData: FormData) {
     redirect('/admin/site-config/featured-photos/new?error=missing');
   }
 
-  createFeaturedPhoto({
+  await createFeaturedPhoto({
     title,
     description: description || undefined,
     date: date || undefined,
@@ -126,7 +123,7 @@ export async function updateFeaturedPhotoAction(formData: FormData) {
   const sortOrder = Number(formData.get('sort_order')) || 0;
   const isActive = formData.get('is_active') === 'on';
 
-  updateFeaturedPhoto(id, {
+  await updateFeaturedPhoto(id, {
     title,
     description: description || undefined,
     date: date || undefined,
@@ -143,11 +140,10 @@ export async function updateFeaturedPhotoAction(formData: FormData) {
 export async function deleteFeaturedPhotoAction(formData: FormData) {
   await requireAuth();
   const id = Number(formData.get('id'));
-  deleteFeaturedPhoto(id);
+  await deleteFeaturedPhoto(id);
   redirect('/admin/site-config/featured-photos');
 }
 
-// ===== Carousel =====
 export async function createCarouselItemAction(formData: FormData) {
   await requireAuth();
   const type = formData.get('type') as 'image' | 'video';
@@ -166,7 +162,7 @@ export async function createCarouselItemAction(formData: FormData) {
     redirect('/admin/site-config/carousel/new?error=missing');
   }
 
-  createCarouselItem({
+  await createCarouselItem({
     type,
     title,
     caption: caption || undefined,
@@ -198,7 +194,7 @@ export async function updateCarouselItemAction(formData: FormData) {
   const sortOrder = Number(formData.get('sort_order')) || 0;
   const isActive = formData.get('is_active') === 'on';
 
-  updateCarouselItem(id, {
+  await updateCarouselItem(id, {
     type,
     title,
     caption: caption || undefined,
@@ -218,6 +214,6 @@ export async function updateCarouselItemAction(formData: FormData) {
 export async function deleteCarouselItemAction(formData: FormData) {
   await requireAuth();
   const id = Number(formData.get('id'));
-  deleteCarouselItem(id);
+  await deleteCarouselItem(id);
   redirect('/admin/site-config/carousel');
 }

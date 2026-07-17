@@ -22,7 +22,7 @@ export async function createPhotoAction(formData: FormData) {
     redirect('/admin/photos/new?error=missing');
   }
 
-  createPhoto({
+  await createPhoto({
     album_id: albumId,
     image_url: imageUrl,
     image_alt: imageAlt || undefined,
@@ -54,7 +54,7 @@ export async function updatePhotoAction(formData: FormData) {
   const location = formData.get('location') as string;
   const sortOrder = Number(formData.get('sort_order')) || 0;
 
-  updatePhoto(id, {
+  await updatePhoto(id, {
     album_id: albumId,
     image_url: imageUrl,
     image_alt: imageAlt || undefined,
@@ -74,6 +74,6 @@ export async function updatePhotoAction(formData: FormData) {
 export async function deletePhotoAction(formData: FormData) {
   await requireAuth();
   const id = Number(formData.get('id'));
-  deletePhoto(id);
+  await deletePhoto(id);
   redirect('/admin/photos');
 }

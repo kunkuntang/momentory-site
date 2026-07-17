@@ -4,8 +4,8 @@ import PageHeader from '@/components/admin/PageHeader';
 import DataTable, { type Column } from '@/components/admin/DataTable';
 import type { PhotoWithAlbum } from '@/lib/repositories/photos';
 
-export default function PhotosPage() {
-  const photos = getAllPhotos();
+export default async function PhotosPage() {
+  const photos = await getAllPhotos();
 
   const columns: Column<PhotoWithAlbum>[] = [
     { key: 'id', label: 'ID', className: 'w-12' },

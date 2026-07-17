@@ -3,8 +3,8 @@ import { getAllAlbums, type AlbumWithPhotoCount } from '@/lib/repositories/album
 import PageHeader from '@/components/admin/PageHeader';
 import DataTable, { type Column } from '@/components/admin/DataTable';
 
-export default function AlbumsPage() {
-  const albums = getAllAlbums();
+export default async function AlbumsPage() {
+  const albums = await getAllAlbums();
 
   const columns: Column<AlbumWithPhotoCount>[] = [
     { key: 'id', label: 'ID', className: 'w-12' },
@@ -13,7 +13,6 @@ export default function AlbumsPage() {
       label: '封面',
       render: (item) =>
         item.cover_image_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={item.cover_image_url}
             alt={item.cover_image_alt ?? ''}

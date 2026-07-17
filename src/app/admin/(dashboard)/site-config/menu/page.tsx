@@ -3,7 +3,7 @@ import { getAllMenuItems, type MenuItem, type LinkType } from '@/lib/repositorie
 import PageHeader from '@/components/admin/PageHeader';
 import DataTable, { type Column } from '@/components/admin/DataTable';
 
-const linkTypeLabels: Record<LinkType, string> = {
+const linkTypeLabels: Record<string, string> = {
   inner: '内部链接',
   outer: '外部链接',
   mini_program: '小程序',
@@ -12,8 +12,8 @@ const linkTypeLabels: Record<LinkType, string> = {
   apple_app: 'Apple App',
 };
 
-export default function MenuListPage() {
-  const items = getAllMenuItems();
+export default async function MenuListPage() {
+  const items = await getAllMenuItems();
 
   const columns: Column<MenuItem>[] = [
     { key: 'id', label: 'ID', className: 'w-12' },

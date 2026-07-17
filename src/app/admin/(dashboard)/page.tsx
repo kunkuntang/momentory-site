@@ -6,12 +6,12 @@ import { getAllPhotos } from '@/lib/repositories/photos';
 import { getAllAlbums } from '@/lib/repositories/albums';
 import { getAllFeaturedPhotos } from '@/lib/repositories/featuredPhotos';
 
-export default function DashboardPage() {
-  const users = getAllUsers();
-  const roles = getAllRoles();
-  const photos = getAllPhotos();
-  const albums = getAllAlbums();
-  const featured = getAllFeaturedPhotos();
+export default async function DashboardPage() {
+  const users = await getAllUsers();
+  const roles = await getAllRoles();
+  const photos = await getAllPhotos();
+  const albums = await getAllAlbums();
+  const featured = await getAllFeaturedPhotos();
 
   const stats = [
     { label: '用户', value: users.length, icon: Users, href: '/admin/users', color: 'text-blue-600' },

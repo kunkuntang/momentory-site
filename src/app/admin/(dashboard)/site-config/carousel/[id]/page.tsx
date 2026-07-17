@@ -13,7 +13,7 @@ interface EditCarouselItemPageProps {
 
 export default async function EditCarouselItemPage({ params }: EditCarouselItemPageProps) {
   const { id } = await params;
-  const item = getCarouselItemById(Number(id));
+  const item = await getCarouselItemById(Number(id));
   if (!item) notFound();
 
   return (

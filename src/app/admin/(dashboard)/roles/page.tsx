@@ -23,8 +23,8 @@ function formatPermissions(permissions: string): string {
   }
 }
 
-export default function RolesPage() {
-  const roles = getAllRoles();
+export default async function RolesPage() {
+  const roles = await getAllRoles();
 
   const columns: Column<UserRoleWithCount>[] = [
     { key: 'id', label: 'ID', className: 'w-12' },

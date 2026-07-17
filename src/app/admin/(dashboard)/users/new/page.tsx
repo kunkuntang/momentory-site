@@ -5,8 +5,8 @@ import { FormField, Input, Select, Checkbox } from '@/components/admin/FormField
 import SubmitButton from '@/components/admin/SubmitButton';
 import { createUserAction } from '../actions';
 
-export default function NewUserPage() {
-  const roles = getAllRoles();
+export default async function NewUserPage() {
+  const roles = await getAllRoles();
 
   return (
     <div>

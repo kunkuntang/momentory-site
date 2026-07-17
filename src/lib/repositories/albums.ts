@@ -1,118 +1,85 @@
-import db from '../database';
+import prisma from '../prisma';
+import type { Album as PrismaAlbum, Photo as PrismaPhoto } from '../../../prisma/generated/client/client';
 
-export interface Album {
-  id: number;
-  slug: string;
-  title: string;
-  summary: string | null;
-  cover_image_url: string | null;
-  cover_image_alt: string | null;
-  is_private: number;
-  created_at: string;
-  updated_at: string;
-}
+export type Album = PrismaAlbum;
+export type Photo = PrismaPhoto;
 
-export interface AlbumWithPhotoCount extends Album {
-  photo_count: number;
-}
+export type AlbumWithPhotoCount = Album & { photo_count: number };
 
-export interface AlbumWithPhotos extends Album {
+export type AlbumWithPhotos = Album & {
   photo_count: number;
   photos: Photo[];
-}
+};
 
-export interface Photo {
-  id: number;
-  album_id: number;
-  image_url: string;
-  image_alt: string | null;
-  title: string | null;
-  description: string | null;
-  category_id: number | null;
-  is_live: number;
-  live_mp4_url: string | null;
-  date: string | null;
-  location: string | null;
-  sort_order: number;
-  created_at: string;
-}
-
-export function getAllAlbums(): AlbumWithPhotoCount[] {
-  const stmt = db.prepare(`
+export async function getAllAlbums(): Promise<AlbumWithPhotoCount[]> {
+  return await prisma.$queryRaw`
     SELECT a.*, COUNT(p.id) as photo_count
     FROM albums a
     LEFT JOIN photos p ON a.id = p.album_id
     GROUP BY a.id
     ORDER BY a.created_at DESC
-  `);
-  return stmt.all() as AlbumWithPhotoCount[];
+  `;
 }
 
-export function getAlbumBySlug(slug: string): AlbumWithPhotos | null {
-  const albumStmt = db.prepare(`
+export async function getAlbumBySlug(slug: string): Promise<AlbumWithPhotos | null> {
+  const album = await prisma.$queryRaw<AlbumWithPhotoCount[]>`
     SELECT a.*, COUNT(p.id) as photo_count
     FROM albums a
     LEFT JOIN photos p ON a.id = p.album_id
-    WHERE a.slug = ?
+    WHERE a.slug = ${slug}
     GROUP BY a.id
-  `);
-  const album = albumStmt.get(slug) as AlbumWithPhotoCount | null;
-  
-  if (!album) return null;
-  
-  const photosStmt = db.prepare(`
-    SELECT * FROM photos WHERE album_id = ? ORDER BY sort_order ASC
-  `);
-  const photos = photosStmt.all(album.id) as Photo[];
-  
-  return { ...album, photos };
+  `;
+
+  if (!album[0]) return null;
+
+  const photos = await prisma.photo.findMany({
+    where: { album_id: album[0].id },
+    orderBy: { sort_order: 'asc' },
+  });
+
+  return { ...album[0], photos };
 }
 
-export function getAlbumById(id: number): AlbumWithPhotos | null {
-  const albumStmt = db.prepare(`
+export async function getAlbumById(id: number): Promise<AlbumWithPhotos | null> {
+  const album = await prisma.$queryRaw<AlbumWithPhotoCount[]>`
     SELECT a.*, COUNT(p.id) as photo_count
     FROM albums a
     LEFT JOIN photos p ON a.id = p.album_id
-    WHERE a.id = ?
+    WHERE a.id = ${id}
     GROUP BY a.id
-  `);
-  const album = albumStmt.get(id) as AlbumWithPhotoCount | null;
+  `;
 
-  if (!album) return null;
+  if (!album[0]) return null;
 
-  const photosStmt = db.prepare(`
-    SELECT * FROM photos WHERE album_id = ? ORDER BY sort_order ASC
-  `);
-  const photos = photosStmt.all(album.id) as Photo[];
+  const photos = await prisma.photo.findMany({
+    where: { album_id: album[0].id },
+    orderBy: { sort_order: 'asc' },
+  });
 
-  return { ...album, photos };
+  return { ...album[0], photos };
 }
 
-export function createAlbum(data: {
+export async function createAlbum(data: {
   slug: string;
   title: string;
   summary?: string;
   cover_image_url?: string;
   cover_image_alt?: string;
   is_private?: boolean;
-}): Album {
-  const stmt = db.prepare(`
-    INSERT INTO albums (slug, title, summary, cover_image_url, cover_image_alt, is_private)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `);
-  const result = stmt.run(
-    data.slug,
-    data.title,
-    data.summary ?? null,
-    data.cover_image_url ?? null,
-    data.cover_image_alt ?? null,
-    data.is_private ? 1 : 0,
-  );
-  const fetchStmt = db.prepare(`SELECT * FROM albums WHERE id = ?`);
-  return fetchStmt.get(result.lastInsertRowid) as Album;
+}): Promise<Album> {
+  return await prisma.album.create({
+    data: {
+      slug: data.slug,
+      title: data.title,
+      summary: data.summary ?? null,
+      cover_image_url: data.cover_image_url ?? null,
+      cover_image_alt: data.cover_image_alt ?? null,
+      is_private: data.is_private ?? false,
+    },
+  });
 }
 
-export function updateAlbum(
+export async function updateAlbum(
   id: number,
   data: {
     slug?: string;
@@ -122,45 +89,21 @@ export function updateAlbum(
     cover_image_alt?: string;
     is_private?: boolean;
   },
-): void {
-  const fields: string[] = [];
-  const values: (string | number | null)[] = [];
-
-  if (data.slug !== undefined) {
-    fields.push('slug = ?');
-    values.push(data.slug);
-  }
-  if (data.title !== undefined) {
-    fields.push('title = ?');
-    values.push(data.title);
-  }
-  if (data.summary !== undefined) {
-    fields.push('summary = ?');
-    values.push(data.summary);
-  }
-  if (data.cover_image_url !== undefined) {
-    fields.push('cover_image_url = ?');
-    values.push(data.cover_image_url);
-  }
-  if (data.cover_image_alt !== undefined) {
-    fields.push('cover_image_alt = ?');
-    values.push(data.cover_image_alt);
-  }
-  if (data.is_private !== undefined) {
-    fields.push('is_private = ?');
-    values.push(data.is_private ? 1 : 0);
-  }
-
-  if (fields.length === 0) return;
-
-  fields.push('updated_at = CURRENT_TIMESTAMP');
-  values.push(id);
-
-  const stmt = db.prepare(`UPDATE albums SET ${fields.join(', ')} WHERE id = ?`);
-  stmt.run(...values);
+): Promise<void> {
+  await prisma.album.update({
+    where: { id },
+    data: {
+      ...(data.slug !== undefined && { slug: data.slug }),
+      ...(data.title !== undefined && { title: data.title }),
+      ...(data.summary !== undefined && { summary: data.summary ?? null }),
+      ...(data.cover_image_url !== undefined && { cover_image_url: data.cover_image_url ?? null }),
+      ...(data.cover_image_alt !== undefined && { cover_image_alt: data.cover_image_alt ?? null }),
+      ...(data.is_private !== undefined && { is_private: data.is_private }),
+      updated_at: new Date(),
+    },
+  });
 }
 
-export function deleteAlbum(id: number): void {
-  const stmt = db.prepare(`DELETE FROM albums WHERE id = ?`);
-  stmt.run(id);
+export async function deleteAlbum(id: number): Promise<void> {
+  await prisma.album.delete({ where: { id } });
 }

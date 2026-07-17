@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-const COOKIE_NAME = 'admin_token';
+const COOKIE_NAME = 'momentory_admin_token';
 const TOKEN_EXPIRY = '24h';
 
 export interface Session {

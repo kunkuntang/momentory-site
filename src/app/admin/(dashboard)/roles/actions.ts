@@ -14,7 +14,7 @@ export async function createRoleAction(formData: FormData) {
     redirect('/admin/roles/new?error=missing');
   }
 
-  createRole({
+  await createRole({
     name,
     description: description || undefined,
     permissions: JSON.stringify(permissions),
@@ -30,7 +30,7 @@ export async function updateRoleAction(formData: FormData) {
   const description = formData.get('description') as string;
   const permissions = formData.getAll('permissions') as string[];
 
-  updateRole(id, {
+  await updateRole(id, {
     name,
     description: description || undefined,
     permissions: JSON.stringify(permissions),
@@ -42,10 +42,10 @@ export async function updateRoleAction(formData: FormData) {
 export async function deleteRoleAction(formData: FormData) {
   await requireAuth();
   const id = Number(formData.get('id'));
-  const userCount = countUsersByRole(id);
+  const userCount = await countUsersByRole(id);
   if (userCount > 0) {
     redirect('/admin/roles?error=has_users');
   }
-  deleteRole(id);
+  await deleteRole(id);
   redirect('/admin/roles');
 }

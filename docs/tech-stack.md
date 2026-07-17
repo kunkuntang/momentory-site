@@ -25,13 +25,23 @@ Momentory 是一个基于 Next.js 构建的相册展示网站，采用现代化�
 
 | 技术 | 版本 | 说明 |
 | ---- | ---- | ---- |
-| SQLite 3 | - | 轻量级嵌入式数据库 |
-| better-sqlite3 | ^12.11.1 | 高性能 SQLite 驱动 |
+| MySQL | 8.0+ | 关系型数据库管理系统 |
+| mysql2 | ^3.10.0 | 高性能 MySQL 驱动（Promise API） |
 
 **数据库配置**:
-- 数据库文件: `db/momentory.sqlite`
-- 事务模式: WAL (Write-Ahead Logging)
-- 外键约束: 启用
+- 字符集: `utf8mb4`
+- 排序规则: `utf8mb4_unicode_ci`
+- 存储引擎: InnoDB
+- 连接池: 最大连接数 10
+
+**环境变量**:
+```bash
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=momentory
+```
 
 ## 样式方案
 
@@ -96,10 +106,8 @@ Momentory 是一个基于 Next.js 构建的相册展示网站，采用现代化�
 ## 项目结构
 
 ```
-├── db/                          # 数据库目录
-│   └── momentory.sqlite         # SQLite 数据库文件
 ├── sql/                         # SQL 脚本目录
-│   └── init.sql                 # 数据库初始化脚本
+│   └── init.sql                 # 数据库初始化脚本（MySQL）
 ├── src/
 │   ├── app/                     # Next.js App Router 路由
 │   │   ├── about/               # 关于页面
@@ -188,6 +196,7 @@ Momentory 是一个基于 Next.js 构建的相册展示网站，采用现代化�
 ## 性能优化
 
 - 使用 Next.js App Router 进行服务端渲染
-- SQLite WAL 模式提升并发性能
+- MySQL 连接池管理提升并发性能
+- 数据库索引优化查询效率
 - CSS Modules 减少样式冲突和体积
 - GSAP 实现高性能动画

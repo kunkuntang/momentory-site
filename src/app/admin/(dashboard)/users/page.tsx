@@ -4,8 +4,8 @@ import PageHeader from '@/components/admin/PageHeader';
 import DataTable, { type Column } from '@/components/admin/DataTable';
 import type { UserListItem } from '@/lib/repositories/users';
 
-export default function UsersPage() {
-  const users = getAllUsers();
+export default async function UsersPage() {
+  const users = await getAllUsers();
 
   const columns: Column<UserListItem>[] = [
     { key: 'id', label: 'ID', className: 'w-12' },
@@ -23,7 +23,7 @@ export default function UsersPage() {
     {
       key: 'last_login_at',
       label: '最后登录',
-      render: (item) => item.last_login_at ?? '-',
+      render: (item) => item.last_login_at ? item.last_login_at.toString() : '-',
     },
     { key: 'created_at', label: '创建时间' },
     {

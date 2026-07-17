@@ -13,7 +13,7 @@ interface EditAlbumPageProps {
 
 export default async function EditAlbumPage({ params }: EditAlbumPageProps) {
   const { id } = await params;
-  const album = getAlbumById(Number(id));
+  const album = await getAlbumById(Number(id));
   if (!album) notFound();
 
   return (

@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Album {
+  id              Int      @id @default(autoincrement())
+  slug            String   @unique @db.VarChar(128)
+  title           String   @db.VarChar(255)
+  summary         String?  @db.Text
+  cover_image_url String?  @db.VarChar(512)
+  cover_image_alt String?  @db.VarChar(255)
+  is_private      Boolean  @default(false)
+  created_at      DateTime @default(now()) @db.DateTime
+  updated_at      DateTime @default(now()) @db.DateTime
+
+  photos Photo[]
+
+  @@index([slug])
+  @@map("albums")
+}
+
+model Photo {
+  id            Int           @id @default(autoincrement())
+  album_id      Int
+  image_url     String        @db.VarChar(512)
+  image_alt     String?       @db.VarChar(255)
+  title         String?       @db.VarChar(255)
+  description   String?       @db.Text
+  category_id   Int?
+  is_live       Boolean       @default(false)
+  live_mp4_url  String?       @db.VarChar(512)
+  date          String?       @db.VarChar(32)
+  location      String?       @db.VarChar(128)
+  sort_order    Int           @default(0)
+  created_at    DateTime      @default(now()) @db.DateTime
+
+  album         Album         @relation(fields: [album_id], references: [id], onDelete: Cascade)
+  category      PhotoCategory? @relation(fields: [category_id], references: [id], onDelete: SetNull)
+
+  @@index([album_id])
+  @@map("photos")
+}
+
+model PhotoCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(64)
+  description String?  @db.Text
+  created_at  DateTime @default(now()) @db.DateTime
+
+  photos Photo[]
+
+  @@map("photo_categories")
+}
+
+model HomeCarousel {
+  id                   Int      @id @default(autoincrement())
+  type                 String   @db.VarChar(16)
+  title                String   @db.VarChar(255)
+  caption              String?  @db.Text
+  photo_id             Int?
+  photo_live_poster_url String? @db.VarChar(512)
+  video_url            String?  @db.VarChar(512)
+  video_id             Int?
+  video_poster_url     String?  @db.VarChar(512)
+  date                 String?  @db.VarChar(32)
+  location             String?  @db.VarChar(128)
+  sort_order           Int      @default(0)
+  is_active            Boolean  @default(true)
+  created_at           DateTime @default(now()) @db.DateTime
+  updated_at           DateTime @default(now()) @db.DateTime
+
+  @@index([sort_order, is_active])
+  @@map("home_carousel")
+}
+
+model FeaturedPhoto {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  description String?  @db.Text
+  date        String?  @db.VarChar(32)
+  location    String?  @db.VarChar(128)
+  image_url   String   @db.VarChar(512)
+  image_alt   String?  @db.VarChar(255)
+  sort_order  Int      @default(0)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.DateTime
+  updated_at  DateTime @default(now()) @db.DateTime
+
+  @@index([sort_order, is_active])
+  @@map("featured_photos")
+}
+
+model SiteConfig {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(128)
+  logo_text   String   @db.VarChar(32)
+  tagline     String   @db.VarChar(255)
+  copyright   String   @db.VarChar(255)
+  created_at  DateTime @default(now()) @db.DateTime
+  updated_at  DateTime @default(now()) @db.DateTime
+
+  @@map("site_config")
+}
+
+model Menu {
+  id          Int      @id @default(autoincrement())
+  label       String   @db.VarChar(64)
+  url         String   @db.VarChar(512)
+  link_type   String   @db.VarChar(32) @default("inner")
+  sort_order  Int      @default(0)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.DateTime
+
+  @@index([sort_order, is_active])
+  @@map("menu")
+}
+
+model UserRole {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(64)
+  description String?  @db.Text
+  permissions String   @db.Text @default("[]")
+  created_at  DateTime @default(now()) @db.DateTime
+  updated_at  DateTime @default(now()) @db.DateTime
+
+  users User[]
+
+  @@map("user_roles")
+}
+
+model User {
+  id             Int      @id @default(autoincrement())
+  username       String   @unique @db.VarChar(64)
+  password_hash  String   @db.VarChar(255)
+  role_id        Int
+  is_active      Boolean  @default(true)
+  last_login_at  DateTime? @db.DateTime
+  created_at     DateTime @default(now()) @db.DateTime
+  updated_at     DateTime @default(now()) @db.DateTime
+
+  role UserRole @relation(fields: [role_id], references: [id], onDelete: Restrict)
+
+  @@index([username])
+  @@map("users")
+}

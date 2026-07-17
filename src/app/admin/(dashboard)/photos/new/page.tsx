@@ -6,9 +6,9 @@ import { FormField, Input, Textarea, Select, Checkbox } from '@/components/admin
 import SubmitButton from '@/components/admin/SubmitButton';
 import { createPhotoAction } from '../actions';
 
-export default function NewPhotoPage() {
-  const albums = getAllAlbums();
-  const categories = getAllCategories();
+export default async function NewPhotoPage() {
+  const albums = await getAllAlbums();
+  const categories = await getAllCategories();
 
   return (
     <div>
