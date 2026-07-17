@@ -3,8 +3,8 @@ import { join } from 'path';
 import bcrypt from 'bcryptjs';
 import prisma from '../lib/prisma';
 
-const sqlPath = join(process.cwd(), 'sql', 'init.sql');
-const sql = readFileSync(sqlPath, 'utf-8');
+const schemaPath = join(process.cwd(), 'sql', 'schema.sql');
+const seedDataPath = join(process.cwd(), 'sql', 'seed-data.sql');
 
 const defaultPassword = process.env.ADMIN_DEFAULT_PASSWORD;
 const defaultUsername = process.env.ADMIN_DEFAULT_USERNAME || 'cb_mome_root';
@@ -23,12 +23,21 @@ if (defaultPassword.length < 8) {
   process.exit(1);
 }
 
+async function executeSqlFile(filePath: string) {
+  const sql = readFileSync(filePath, 'utf-8');
+  const statements = sql.split(';').filter(stmt => stmt.trim());
+  for (const statement of statements) {
+    await prisma.$executeRawUnsafe(statement);
+  }
+}
+
 async function initDatabase() {
   try {
-    const statements = sql.split(';').filter(stmt => stmt.trim());
-    for (const statement of statements) {
-      await prisma.$executeRawUnsafe(statement);
-    }
+    console.log('Creating database schema...');
+    await executeSqlFile(schemaPath);
+
+    console.log('Inserting seed data...');
+    await executeSqlFile(seedDataPath);
 
     const hash = bcrypt.hashSync(password, 10);
     await prisma.user.upsert({
