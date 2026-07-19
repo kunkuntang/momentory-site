@@ -44,7 +44,11 @@ export default async function RolesPage() {
       label: '用户数',
       render: (item) => item.user_count,
     },
-    { key: 'created_at', label: '创建时间' },
+    {
+      key: "created_at",
+      label: "创建时间",
+      render: (item) => item.created_at.toLocaleString(),
+    },
     {
       key: 'actions',
       label: '操作',

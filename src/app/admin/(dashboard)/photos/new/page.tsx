@@ -14,19 +14,30 @@ export default async function NewPhotoPage() {
     <div>
       <PageHeader title="新建照片" />
       <div className="max-w-2xl">
-        <form
-          action={createPhotoAction}
-          className="bg-white rounded-lg border border-admin-border p-6 space-y-1"
-        >
-          <FormField label="所属相册" name="album_id">
-            <Select name="album_id" required>
-              {albums.map((album) => (
-                <option key={album.id} value={album.id}>
-                  {album.title}
-                </option>
-              ))}
-            </Select>
-          </FormField>
+        {albums.length === 0 ? (
+          <div className="bg-white rounded-lg border border-admin-border p-6">
+            <p className="text-admin-muted mb-4">暂无相册，请先创建相册。</p>
+            <Link
+              href="/admin/albums/new"
+              className="px-4 py-2 bg-admin-accent text-white text-sm rounded-md hover:bg-admin-accent-dark transition-colors"
+            >
+              创建相册
+            </Link>
+          </div>
+        ) : (
+          <form
+            action={createPhotoAction}
+            className="bg-white rounded-lg border border-admin-border p-6 space-y-1"
+          >
+            <FormField label="所属相册" name="album_id">
+              <Select name="album_id" required>
+                {albums.map((album) => (
+                  <option key={album.id} value={album.id}>
+                    {album.title}
+                  </option>
+                ))}
+              </Select>
+            </FormField>
 
           <FormField label="图片URL" name="image_url" hint="图片URL">
             <Input name="image_url" required placeholder="请输入图片URL" />
@@ -84,7 +95,8 @@ export default async function NewPhotoPage() {
               取消
             </Link>
           </div>
-        </form>
+          </form>
+        )}
       </div>
     </div>
   );

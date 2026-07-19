@@ -23,9 +23,13 @@ export default async function UsersPage() {
     {
       key: 'last_login_at',
       label: '最后登录',
-      render: (item) => item.last_login_at ? item.last_login_at.toString() : '-',
+      render: (item) => item.last_login_at ? item.last_login_at.toLocaleString() : '-',
     },
-    { key: 'created_at', label: '创建时间' },
+    {
+      key: "created_at",
+      label: "创建时间",
+      render: (item) => item.created_at.toLocaleString(),
+    },
     {
       key: 'actions',
       label: '操作',

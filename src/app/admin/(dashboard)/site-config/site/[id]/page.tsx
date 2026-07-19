@@ -13,6 +13,17 @@ export default async function EditSiteConfigPage({ params }: EditSiteConfigPageP
   const { id } = await params;
   const siteInfo = await getSiteInfo();
 
+  if (!siteInfo) {
+    return (
+      <div className="max-w-lg">
+        <PageHeader title="编辑站点配置" />
+        <div className="bg-white rounded-lg border border-admin-border p-6">
+          <p className="text-admin-muted">站点配置不存在，请先创建站点配置。</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <PageHeader title="编辑站点配置" />

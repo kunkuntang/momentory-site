@@ -34,7 +34,11 @@ export default async function AlbumsPage() {
       label: '是否私密',
       render: (item) => (item.is_private ? '是' : '否'),
     },
-    { key: 'created_at', label: '创建时间' },
+    {
+      key: "created_at",
+      label: "创建时间",
+      render: (item) => item.created_at.toLocaleString(),
+    },
     {
       key: 'actions',
       label: '操作',
@@ -48,6 +52,7 @@ export default async function AlbumsPage() {
       ),
     },
   ];
+  console.log('columns', columns)
 
   return (
     <div>
