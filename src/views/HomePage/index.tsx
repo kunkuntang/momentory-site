@@ -177,6 +177,7 @@ function HomePage(props: HomePageProps) {
     });
 
     const slide = siteData.heroSlides[activeSlide];
+    if (!slide) return;
     if (slide.type === 'video') {
       const video = videoRefs.current[activeSlide];
       if (!video) return undefined;
@@ -229,96 +230,102 @@ function HomePage(props: HomePageProps) {
 
   return (
     <main ref={pageRef}>
-      <section ref={heroRef} className={cx('hero')} aria-label="照片轮播">
-        {siteData.heroSlides.map((slide, index) => (
-          <article
-            key={slide.id}
-            className={cx('hero-slide', { 'is-active': index === activeSlide })}
-            data-hero-slide
-          >
-            {slide.type === 'video' ? (
-              <video
-                ref={(element) => {
-                  videoRefs.current[index] = element;
-                }}
-                data-hero-media
-                src={slide.video_url ?? ''}
-                poster={slide.video_poster_url ?? ''}
-                muted
-                playsInline
-                preload="metadata"
-                aria-label={slide.caption ?? ''}
-              />
-            ) : (
-              <img data-hero-media src={slide.image_url ?? ''} alt={(slide.image_alt ?? slide.caption) ?? ''} />
-            )}
-            <div className={cx('hero-copy')}>
-              <p className={cx('eyebrow')} data-hero-copy-item>
-                {slide.date} / {slide.location}
-              </p>
-              <h1 data-hero-copy-item>{slide.title}</h1>
-              <p data-hero-copy-item>{slide.caption}</p>
-            </div>
-          </article>
-        ))}
-        <div
-          className={cx('hero-progress', { 'is-visible': siteData.heroSlides[activeSlide]?.type === 'video' })}
-          aria-hidden="true"
-        >
-          <span style={{ transform: `scaleX(${slideProgress})` }} />
-        </div>
-        <div className={cx('hero-dots')} aria-label="轮播控制">
+      {siteData.heroSlides.length > 0 && (
+        <section ref={heroRef} className={cx('hero')} aria-label="照片轮播">
           {siteData.heroSlides.map((slide, index) => (
-            <button
+            <article
               key={slide.id}
-              type="button"
-              className={cx({ 'is-active': index === activeSlide })}
-              aria-label={`查看第 ${index + 1} 张照片`}
-              aria-pressed={index === activeSlide}
-              onClick={() => goToSlide(index)}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section className={cx('section')} data-latest-albums-section>
-        <div className={cx('section-inner')}>
-          <div data-latest-motion>
-            <SectionHeader title="最新相册" action={<TextLink to="/albums">展示更多</TextLink>} />
-          </div>
-          <div className={cx('album-grid')}>
-            {siteData.latestAlbums.map((album) => (
-              <div key={album.slug} data-latest-motion>
-                <AlbumCard album={album} />
+              className={cx('hero-slide', { 'is-active': index === activeSlide })}
+              data-hero-slide
+            >
+              {slide.type === 'video' ? (
+                <video
+                  ref={(element) => {
+                    videoRefs.current[index] = element;
+                  }}
+                  data-hero-media
+                  src={slide.video_url ?? ''}
+                  poster={slide.video_poster_url ?? ''}
+                  muted
+                  playsInline
+                  preload="metadata"
+                  aria-label={slide.caption ?? ''}
+                />
+              ) : (
+                <img data-hero-media src={slide.image_url ?? ''} alt={(slide.image_alt ?? slide.caption) ?? ''} />
+              )}
+              <div className={cx('hero-copy')}>
+                <p className={cx('eyebrow')} data-hero-copy-item>
+                  {slide.date} / {slide.location}
+                </p>
+                <h1 data-hero-copy-item>{slide.title}</h1>
+                <p data-hero-copy-item>{slide.caption}</p>
               </div>
+            </article>
+          ))}
+          <div
+            className={cx('hero-progress', { 'is-visible': siteData.heroSlides[activeSlide]?.type === 'video' })}
+            aria-hidden="true"
+          >
+            <span style={{ transform: `scaleX(${slideProgress})` }} />
+          </div>
+          <div className={cx('hero-dots')} aria-label="轮播控制">
+            {siteData.heroSlides.map((slide, index) => (
+              <button
+                key={slide.id}
+                type="button"
+                className={cx({ 'is-active': index === activeSlide })}
+                aria-label={`查看第 ${index + 1} 张照片`}
+                aria-pressed={index === activeSlide}
+                onClick={() => goToSlide(index)}
+              />
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      <section className={cx('section', 'featured')} data-featured-section>
-        <div className={cx('section-inner')}>
-          <div data-featured-motion>
-            <SectionHeader title="精选图片" />
-          </div>
-          <div className={cx('feature-list')}>
-            {siteData.featuredPhotos.map((photo, index) => (
-              <article key={photo.id} className={cx('feature-item')} data-featured-motion style={{ zIndex: index + 1 }}>
-                <div className={cx('feature-image')}>
-                  <img src={photo.image_url} alt={photo.image_alt ?? ''} loading="lazy" />
+      {siteData.latestAlbums.length > 0 && (
+        <section className={cx('section')} data-latest-albums-section>
+          <div className={cx('section-inner')}>
+            <div data-latest-motion>
+              <SectionHeader title="最新相册" action={<TextLink to="/albums">展示更多</TextLink>} />
+            </div>
+            <div className={cx('album-grid')}>
+              {siteData.latestAlbums.map((album) => (
+                <div key={album.slug} data-latest-motion>
+                  <AlbumCard album={album} />
                 </div>
-                <div className={cx('feature-copy')}>
-                  <p className={cx('album-meta')}>
-                    {photo.date} / {photo.location}
-                  </p>
-                  <h3>{photo.title}</h3>
-                  <p>{photo.description}</p>
-                </div>
-              </article>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {siteData.featuredPhotos.length > 0 && (
+        <section className={cx('section', 'featured')} data-featured-section>
+          <div className={cx('section-inner')}>
+            <div data-featured-motion>
+              <SectionHeader title="精选图片" />
+            </div>
+            <div className={cx('feature-list')}>
+              {siteData.featuredPhotos.map((photo, index) => (
+                <article key={photo.id} className={cx('feature-item')} data-featured-motion style={{ zIndex: index + 1 }}>
+                  <div className={cx('feature-image')}>
+                    <img src={photo.image_url} alt={photo.image_alt ?? ''} loading="lazy" />
+                  </div>
+                  <div className={cx('feature-copy')}>
+                    <p className={cx('album-meta')}>
+                      {photo.date} / {photo.location}
+                    </p>
+                    <h3>{photo.title}</h3>
+                    <p>{photo.description}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className={cx('section', 'profile-band')} data-motion-section>
         <div className={cx('section-inner')}>
