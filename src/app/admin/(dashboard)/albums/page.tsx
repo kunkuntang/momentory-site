@@ -52,7 +52,6 @@ export default async function AlbumsPage() {
       ),
     },
   ];
-  console.log('columns', columns)
 
   return (
     <div>
