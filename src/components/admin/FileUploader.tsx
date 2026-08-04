@@ -20,6 +20,8 @@ interface FileUploaderProps {
   onChange?: (url: string, key: string) => void;
   maxSize?: number;
   hint?: string;
+  previewType?: 'image' | 'video';
+  uploadText?: string;
 }
 
 export function FileUploader({
@@ -30,6 +32,8 @@ export function FileUploader({
   onChange,
   maxSize = 10 * 1024 * 1024,
   hint,
+  previewType = 'image',
+  uploadText = '点击上传图片',
 }: FileUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -94,11 +98,19 @@ export function FileUploader({
         <div className="flex flex-col gap-3">
           <div className="relative group">
             <div className="rounded-lg overflow-hidden border border-admin-border shadow-sm hover:shadow-md transition-shadow duration-200">
-              <img
-                src={value}
-                alt="已上传图片"
-                className="w-full max-h-64 object-contain bg-gray-50"
-              />
+              {previewType === 'video' ? (
+                <video
+                  src={value}
+                  controls
+                  className="w-full max-h-64 object-contain bg-black"
+                />
+              ) : (
+                <img
+                  src={value}
+                  alt="已上传图片"
+                  className="w-full max-h-64 object-contain bg-gray-50"
+                />
+              )}
               {uploading && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                   <div className="flex flex-col items-center gap-2">
@@ -156,7 +168,7 @@ export function FileUploader({
               <div className="w-14 h-14 rounded-full bg-admin-accent/10 flex items-center justify-center">
                 <Upload size={28} className="text-admin-accent" />
               </div>
-              <span className="text-sm text-admin-ink font-medium">点击上传图片</span>
+              <span className="text-sm text-admin-ink font-medium">{uploadText}</span>
               {hint && <span className="text-xs text-admin-muted">{hint}</span>}
             </>
           )}
@@ -184,6 +196,17 @@ export function ImageUploader({ aspectRatio = '1/1', ...props }: ImageUploaderPr
   return (
     <FileUploader
       accept="image/jpeg,image/png,image/gif,image/webp"
+      {...props}
+    />
+  );
+}
+
+export function VideoUploader(props: Omit<FileUploaderProps, 'accept' | 'previewType'>) {
+  return (
+    <FileUploader
+      accept="video/mp4,video/quicktime,video/x-msvideo"
+      previewType="video"
+      uploadText="点击上传视频"
       {...props}
     />
   );

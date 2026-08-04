@@ -1,15 +1,27 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import PageHeader from '@/components/admin/PageHeader';
 import { FormField, Input, Textarea, Checkbox } from '@/components/admin/FormFields';
 import SubmitButton from '@/components/admin/SubmitButton';
+import { ImageUploader } from '@/components/admin/FileUploader';
 import { createAlbumAction } from '../actions';
 
 export default function NewAlbumPage() {
+  const [coverImageUrl, setCoverImageUrl] = useState('');
+
+  const handleCoverImageChange = (url: string) => {
+    setCoverImageUrl(url);
+  };
+
   return (
     <div>
       <PageHeader title="新建相册" />
       <div className="max-w-lg">
         <form action={createAlbumAction} className="bg-white rounded-lg border border-admin-border p-6">
+          <input type="hidden" name="cover_image_url" value={coverImageUrl} />
+
           <FormField label="Slug" name="slug" hint="URL中的标识符，如 coast-light">
             <Input name="slug" required placeholder="coast-light" />
           </FormField>
@@ -22,9 +34,14 @@ export default function NewAlbumPage() {
             <Textarea name="summary" placeholder="请输入相册简介" />
           </FormField>
 
-          <FormField label="封面图片 URL" name="cover_image_url" hint="图片URL">
-            <Input name="cover_image_url" placeholder="https://..." />
-          </FormField>
+          <ImageUploader
+            label="封面图片"
+            name="cover_image"
+            value={coverImageUrl}
+            onChange={handleCoverImageChange}
+            maxSize={10 * 1024 * 1024}
+            hint="支持 JPG、PNG、GIF、WebP 格式，最大 10MB"
+          />
 
           <FormField label="封面图片替代文本" name="cover_image_alt">
             <Input name="cover_image_alt" placeholder="封面图片描述" />

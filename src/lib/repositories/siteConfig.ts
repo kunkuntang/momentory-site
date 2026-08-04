@@ -6,6 +6,7 @@ export type LinkType = 'inner' | 'outer' | 'mini_program' | 'universal_app' | 'a
 export type MenuItem = Menu;
 
 export async function getSiteInfo(): Promise<{ name: string; logo_text: string; tagline: string; copyright: string }> {
+  console.log('getSiteInfo');
   const config = await prisma.siteConfig.findFirst({
     select: { name: true, logo_text: true, tagline: true, copyright: true },
   });

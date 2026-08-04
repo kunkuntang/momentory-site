@@ -9,7 +9,7 @@ interface FormFieldProps {
 
 export function FormField({ label, name, children, hint }: FormFieldProps) {
   return (
-    <div className="mb-4">
+    <div>
       <label htmlFor={name} className="block text-sm font-medium text-admin-ink mb-1">
         {label}
       </label>
@@ -38,17 +38,49 @@ interface CheckboxProps {
   name: string;
   label: string;
   defaultChecked?: boolean;
+  checked?: boolean;
+  onChange?: (checked: boolean) => void;
 }
 
-export function Checkbox({ name, label, defaultChecked }: CheckboxProps) {
+export function Checkbox({ name, label, defaultChecked, checked, onChange }: CheckboxProps) {
   return (
     <label className="flex items-center gap-2 cursor-pointer">
       <input
         type="checkbox"
         name={name}
         defaultChecked={defaultChecked}
+        checked={checked}
+        onChange={onChange ? (e) => onChange(e.target.checked) : undefined}
         className="w-4 h-4 rounded border-admin-border text-admin-accent focus:ring-admin-accent"
       />
+      <span className="text-sm text-admin-ink">{label}</span>
+    </label>
+  );
+}
+
+interface SwitchProps {
+  name: string;
+  label: string;
+  defaultChecked?: boolean;
+  checked?: boolean;
+  onChange?: (checked: boolean) => void;
+}
+
+export function Switch({ name, label, defaultChecked, checked, onChange }: SwitchProps) {
+  return (
+    <label className="flex items-center gap-2 cursor-pointer">
+      <span className="relative inline-flex h-5 w-9 items-center">
+        <input
+          type="checkbox"
+          name={name}
+          defaultChecked={defaultChecked}
+          checked={checked}
+          onChange={onChange ? (e) => onChange(e.target.checked) : undefined}
+          className="peer sr-only"
+        />
+        <span className="absolute inset-0 rounded-full bg-admin-border peer-checked:bg-admin-accent transition-colors" />
+        <span className="absolute left-0.5 h-4 w-4 transform rounded-full bg-white shadow transition-transform peer-checked:translate-x-4" />
+      </span>
       <span className="text-sm text-admin-ink">{label}</span>
     </label>
   );

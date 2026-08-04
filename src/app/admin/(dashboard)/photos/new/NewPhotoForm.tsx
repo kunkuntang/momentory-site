@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { FormField, Input, Textarea, Select, Checkbox } from '@/components/admin/FormFields';
+import { FormField, Input, Textarea, Select, Switch } from '@/components/admin/FormFields';
 import SubmitButton from '@/components/admin/SubmitButton';
-import { ImageUploader } from '@/components/admin/FileUploader';
+import { ImageUploader, VideoUploader } from '@/components/admin/FileUploader';
 import { createPhotoAction } from '../actions';
 
 interface Album {
@@ -24,16 +24,22 @@ interface NewPhotoFormProps {
 export default function NewPhotoForm({ albums, categories }: NewPhotoFormProps) {
   const [imageUrl, setImageUrl] = useState('');
   const [imageKey, setImageKey] = useState('');
+  const [isLive, setIsLive] = useState(false);
+  const [liveMp4Url, setLiveMp4Url] = useState('');
 
   const handleImageChange = (url: string, key: string) => {
     setImageUrl(url);
     setImageKey(key);
   };
 
+  const handleLiveMp4Change = (url: string) => {
+    setLiveMp4Url(url);
+  };
+
   return (
     <form
       action={createPhotoAction}
-      className="bg-white rounded-lg border border-admin-border p-6 space-y-1"
+      className="bg-white rounded-lg border border-admin-border p-6 space-y-4"
     >
       <input type="hidden" name="image_url" value={imageUrl} />
       <input type="hidden" name="image_key" value={imageKey} />
@@ -80,13 +86,23 @@ export default function NewPhotoForm({ albums, categories }: NewPhotoFormProps) 
         </Select>
       </FormField>
 
-      <div className="mb-4">
-        <Checkbox name="is_live" label="Live照片" />
-      </div>
-
-      <FormField label="Live动态视频URL" name="live_mp4_url" hint="Live动态视频URL">
-        <Input name="live_mp4_url" placeholder="请输入Live动态视频URL" />
+      <FormField label="Live照片" name="is_live">
+        <Switch name="is_live" label="Live照片" checked={isLive} onChange={setIsLive} />
       </FormField>
+
+      {isLive && (
+        <>
+          <input type="hidden" name="live_mp4_url" value={liveMp4Url} />
+          <VideoUploader
+            label="Live动态视频"
+            name="live_mp4"
+            value={liveMp4Url}
+            onChange={handleLiveMp4Change}
+            maxSize={50 * 1024 * 1024}
+            hint="支持 MP4、MOV、AVI 格式，最大 50MB"
+          />
+        </>
+      )}
 
       <FormField label="日期" name="date">
         <Input name="date" type="date" />

@@ -36,6 +36,7 @@ export interface SiteData {
 }
 
 export async function getSiteData(): Promise<SiteData> {
+  // console.log('getSiteData');
   const siteInfo = await getSiteInfo();
   const menuItems = await getMenuItems();
   const carouselItems = await getActiveCarouselItems();
