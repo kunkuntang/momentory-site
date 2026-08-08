@@ -1,4 +1,5 @@
 import prisma from '../prisma';
+import { Prisma } from '../../../prisma/generated/client/client';
 import type { Photo } from '../../../prisma/generated/client/client';
 
 export type PhotoWithAlbum = Photo & {
@@ -6,16 +7,41 @@ export type PhotoWithAlbum = Photo & {
   category_name: string | null;
 };
 
+export type PhotoFilters = {
+  categoryId?: number | null;
+  albumId?: number | null;
+  search?: string;
+};
+
 export async function getPhotoById(id: number): Promise<Photo | null> {
   return await prisma.photo.findUnique({ where: { id } });
 }
 
-export async function getAllPhotos(): Promise<PhotoWithAlbum[]> {
+export async function getAllPhotos(filters?: PhotoFilters): Promise<PhotoWithAlbum[]> {
+  const conditions: Prisma.Sql[] = [];
+
+  if (filters?.albumId) {
+    conditions.push(Prisma.sql`p.album_id = ${filters.albumId}`);
+  }
+  if (filters?.categoryId) {
+    conditions.push(Prisma.sql`p.category_id = ${filters.categoryId}`);
+  }
+  const search = filters?.search?.trim();
+  if (search) {
+    conditions.push(Prisma.sql`p.title LIKE ${`%${search}%`}`);
+  }
+
+  const whereClause =
+    conditions.length > 0
+      ? Prisma.sql`WHERE ${Prisma.join(conditions, ' AND ')}`
+      : Prisma.empty;
+
   return await prisma.$queryRaw`
     SELECT p.*, a.title as album_title, c.name as category_name
     FROM photos p
     LEFT JOIN albums a ON p.album_id = a.id
     LEFT JOIN photo_categories c ON p.category_id = c.id
+    ${whereClause}
     ORDER BY p.created_at DESC
   `;
 }

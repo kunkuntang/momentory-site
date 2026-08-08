@@ -20,7 +20,7 @@ export default function EditAlbumForm({ album }: EditAlbumFormProps) {
   };
 
   return (
-    <form action={updateAlbumAction} className="bg-white rounded-lg border border-admin-border p-6">
+    <form action={updateAlbumAction} className="bg-white rounded-lg border border-admin-border p-6 pt-0 space-y-4">
       <input type="hidden" name="id" value={album.id} />
       <input type="hidden" name="cover_image_url" value={coverImageUrl} />
 

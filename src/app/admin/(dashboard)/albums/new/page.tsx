@@ -19,7 +19,7 @@ export default function NewAlbumPage() {
     <div>
       <PageHeader title="新建相册" />
       <div className="max-w-lg">
-        <form action={createAlbumAction} className="bg-white rounded-lg border border-admin-border p-6">
+        <form action={createAlbumAction} className="bg-white rounded-lg border border-admin-border p-6 pt-0 space-y-4">
           <input type="hidden" name="cover_image_url" value={coverImageUrl} />
 
           <FormField label="Slug" name="slug" hint="URL中的标识符，如 coast-light">
