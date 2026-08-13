@@ -57,21 +57,35 @@ export async function createPhoto(data: {
   live_mp4_url?: string;
   date?: string;
   location?: string;
+  exif_make?: string;
+  exif_model?: string;
+  exif_lens?: string;
+  exif_f_number?: string;
+  exif_exposure?: string;
+  exif_iso?: string;
+  exif_focal?: string;
   sort_order?: number;
 }): Promise<Photo> {
   return await prisma.photo.create({
     data: {
-      album_id: data.album_id,
       image_url: data.image_url,
       image_alt: data.image_alt ?? null,
       title: data.title ?? null,
       description: data.description ?? null,
-      category_id: data.category_id ?? null,
       is_live: data.is_live ?? false,
       live_mp4_url: data.live_mp4_url ?? null,
       date: data.date ?? null,
       location: data.location ?? null,
+      exif_make: data.exif_make ?? null,
+      exif_model: data.exif_model ?? null,
+      exif_lens: data.exif_lens ?? null,
+      exif_f_number: data.exif_f_number ?? null,
+      exif_exposure: data.exif_exposure ?? null,
+      exif_iso: data.exif_iso ?? null,
+      exif_focal: data.exif_focal ?? null,
       sort_order: data.sort_order ?? 0,
+      album: { connect: { id: data.album_id } },
+      ...(data.category_id ? { category: { connect: { id: data.category_id } } } : {}),
     },
   });
 }
@@ -89,22 +103,39 @@ export async function updatePhoto(
     live_mp4_url?: string;
     date?: string;
     location?: string;
+    exif_make?: string;
+    exif_model?: string;
+    exif_lens?: string;
+    exif_f_number?: string;
+    exif_exposure?: string;
+    exif_iso?: string;
+    exif_focal?: string;
     sort_order?: number;
   },
 ): Promise<void> {
+  console.log('更新照片', id, data);
   await prisma.photo.update({
     where: { id },
     data: {
-      ...(data.album_id !== undefined && { album_id: data.album_id }),
+      ...(data.album_id !== undefined && { album: { connect: { id: data.album_id } } }),
       ...(data.image_url !== undefined && { image_url: data.image_url }),
       ...(data.image_alt !== undefined && { image_alt: data.image_alt ?? null }),
       ...(data.title !== undefined && { title: data.title ?? null }),
       ...(data.description !== undefined && { description: data.description ?? null }),
-      ...(data.category_id !== undefined && { category_id: data.category_id ?? null }),
+      ...(data.category_id !== undefined && {
+        category: data.category_id ? { connect: { id: data.category_id } } : { disconnect: true },
+      }),
       ...(data.is_live !== undefined && { is_live: data.is_live }),
       ...(data.live_mp4_url !== undefined && { live_mp4_url: data.live_mp4_url ?? null }),
       ...(data.date !== undefined && { date: data.date ?? null }),
       ...(data.location !== undefined && { location: data.location ?? null }),
+      ...(data.exif_make !== undefined && { exif_make: data.exif_make ?? null }),
+      ...(data.exif_model !== undefined && { exif_model: data.exif_model ?? null }),
+      ...(data.exif_lens !== undefined && { exif_lens: data.exif_lens ?? null }),
+      ...(data.exif_f_number !== undefined && { exif_f_number: data.exif_f_number ?? null }),
+      ...(data.exif_exposure !== undefined && { exif_exposure: data.exif_exposure ?? null }),
+      ...(data.exif_iso !== undefined && { exif_iso: data.exif_iso ?? null }),
+      ...(data.exif_focal !== undefined && { exif_focal: data.exif_focal ?? null }),
       ...(data.sort_order !== undefined && { sort_order: data.sort_order }),
     },
   });

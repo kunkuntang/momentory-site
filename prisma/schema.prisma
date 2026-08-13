@@ -36,6 +36,13 @@ model Photo {
   live_mp4_url  String?       @db.VarChar(512)
   date          String?       @db.VarChar(32)
   location      String?       @db.VarChar(128)
+  exif_make      String?      @db.VarChar(64)
+  exif_model     String?      @db.VarChar(64)
+  exif_lens      String?      @db.VarChar(128)
+  exif_f_number  String?      @db.VarChar(16)
+  exif_exposure  String?      @db.VarChar(32)
+  exif_iso       String?      @db.VarChar(16)
+  exif_focal     String?      @db.VarChar(16)
   sort_order    Int           @default(0)
   created_at    DateTime      @default(now()) @db.DateTime
 

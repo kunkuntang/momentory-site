@@ -18,6 +18,7 @@ interface FileUploaderProps {
   accept?: string;
   value?: string;
   onChange?: (url: string, key: string) => void;
+  onFileSelected?: (file: File) => void;
   maxSize?: number;
   hint?: string;
   previewType?: 'image' | 'video';
@@ -30,6 +31,7 @@ export function FileUploader({
   accept = 'image/*',
   value,
   onChange,
+  onFileSelected,
   maxSize = 10 * 1024 * 1024,
   hint,
   previewType = 'image',
@@ -50,6 +52,8 @@ export function FileUploader({
 
     setUploading(true);
     setError(null);
+
+    onFileSelected?.(file);
 
     try {
       const formData = new FormData();
@@ -75,7 +79,7 @@ export function FileUploader({
         fileInputRef.current.value = '';
       }
     }
-  }, [maxSize, onChange]);
+  }, [maxSize, onChange, onFileSelected]);
 
   const handleRemove = useCallback(() => {
     onChange?.('', '');

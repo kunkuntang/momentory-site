@@ -16,6 +16,13 @@ export async function createPhotoAction(formData: FormData) {
   const liveMp4Url = formData.get('live_mp4_url') as string;
   const date = formData.get('date') as string;
   const location = formData.get('location') as string;
+  const exifMake = formData.get('exif_make') as string;
+  const exifModel = formData.get('exif_model') as string;
+  const exifLens = formData.get('exif_lens') as string;
+  const exifFNumber = formData.get('exif_f_number') as string;
+  const exifExposure = formData.get('exif_exposure') as string;
+  const exifIso = formData.get('exif_iso') as string;
+  const exifFocal = formData.get('exif_focal') as string;
   const sortOrder = Number(formData.get('sort_order')) || 0;
 
   if (!albumId || !imageUrl) {
@@ -33,6 +40,13 @@ export async function createPhotoAction(formData: FormData) {
     live_mp4_url: liveMp4Url || undefined,
     date: date || undefined,
     location: location || undefined,
+    exif_make: exifMake || undefined,
+    exif_model: exifModel || undefined,
+    exif_lens: exifLens || undefined,
+    exif_f_number: exifFNumber || undefined,
+    exif_exposure: exifExposure || undefined,
+    exif_iso: exifIso || undefined,
+    exif_focal: exifFocal || undefined,
     sort_order: sortOrder,
   });
 
@@ -52,6 +66,13 @@ export async function updatePhotoAction(formData: FormData) {
   const liveMp4Url = formData.get('live_mp4_url') as string;
   const date = formData.get('date') as string;
   const location = formData.get('location') as string;
+  const exifMake = formData.get('exif_make') as string;
+  const exifModel = formData.get('exif_model') as string;
+  const exifLens = formData.get('exif_lens') as string;
+  const exifFNumber = formData.get('exif_f_number') as string;
+  const exifExposure = formData.get('exif_exposure') as string;
+  const exifIso = formData.get('exif_iso') as string;
+  const exifFocal = formData.get('exif_focal') as string;
   const sortOrder = Number(formData.get('sort_order')) || 0;
 
   await updatePhoto(id, {
@@ -65,6 +86,13 @@ export async function updatePhotoAction(formData: FormData) {
     live_mp4_url: liveMp4Url || undefined,
     date: date || undefined,
     location: location || undefined,
+    exif_make: exifMake || undefined,
+    exif_model: exifModel || undefined,
+    exif_lens: exifLens || undefined,
+    exif_f_number: exifFNumber || undefined,
+    exif_exposure: exifExposure || undefined,
+    exif_iso: exifIso || undefined,
+    exif_focal: exifFocal || undefined,
     sort_order: sortOrder,
   });
 

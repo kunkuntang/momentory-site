@@ -52,6 +52,13 @@ export type PhotoMinAggregateOutputType = {
   live_mp4_url: string | null
   date: string | null
   location: string | null
+  exif_make: string | null
+  exif_model: string | null
+  exif_lens: string | null
+  exif_f_number: string | null
+  exif_exposure: string | null
+  exif_iso: string | null
+  exif_focal: string | null
   sort_order: number | null
   created_at: Date | null
 }
@@ -68,6 +75,13 @@ export type PhotoMaxAggregateOutputType = {
   live_mp4_url: string | null
   date: string | null
   location: string | null
+  exif_make: string | null
+  exif_model: string | null
+  exif_lens: string | null
+  exif_f_number: string | null
+  exif_exposure: string | null
+  exif_iso: string | null
+  exif_focal: string | null
   sort_order: number | null
   created_at: Date | null
 }
@@ -84,6 +98,13 @@ export type PhotoCountAggregateOutputType = {
   live_mp4_url: number
   date: number
   location: number
+  exif_make: number
+  exif_model: number
+  exif_lens: number
+  exif_f_number: number
+  exif_exposure: number
+  exif_iso: number
+  exif_focal: number
   sort_order: number
   created_at: number
   _all: number
@@ -116,6 +137,13 @@ export type PhotoMinAggregateInputType = {
   live_mp4_url?: true
   date?: true
   location?: true
+  exif_make?: true
+  exif_model?: true
+  exif_lens?: true
+  exif_f_number?: true
+  exif_exposure?: true
+  exif_iso?: true
+  exif_focal?: true
   sort_order?: true
   created_at?: true
 }
@@ -132,6 +160,13 @@ export type PhotoMaxAggregateInputType = {
   live_mp4_url?: true
   date?: true
   location?: true
+  exif_make?: true
+  exif_model?: true
+  exif_lens?: true
+  exif_f_number?: true
+  exif_exposure?: true
+  exif_iso?: true
+  exif_focal?: true
   sort_order?: true
   created_at?: true
 }
@@ -148,6 +183,13 @@ export type PhotoCountAggregateInputType = {
   live_mp4_url?: true
   date?: true
   location?: true
+  exif_make?: true
+  exif_model?: true
+  exif_lens?: true
+  exif_f_number?: true
+  exif_exposure?: true
+  exif_iso?: true
+  exif_focal?: true
   sort_order?: true
   created_at?: true
   _all?: true
@@ -251,6 +293,13 @@ export type PhotoGroupByOutputType = {
   live_mp4_url: string | null
   date: string | null
   location: string | null
+  exif_make: string | null
+  exif_model: string | null
+  exif_lens: string | null
+  exif_f_number: string | null
+  exif_exposure: string | null
+  exif_iso: string | null
+  exif_focal: string | null
   sort_order: number
   created_at: Date
   _count: PhotoCountAggregateOutputType | null
@@ -290,6 +339,13 @@ export type PhotoWhereInput = {
   live_mp4_url?: Prisma.StringNullableFilter<"Photo"> | string | null
   date?: Prisma.StringNullableFilter<"Photo"> | string | null
   location?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_make?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_model?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_lens?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_f_number?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_exposure?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_iso?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_focal?: Prisma.StringNullableFilter<"Photo"> | string | null
   sort_order?: Prisma.IntFilter<"Photo"> | number
   created_at?: Prisma.DateTimeFilter<"Photo"> | Date | string
   album?: Prisma.XOR<Prisma.AlbumScalarRelationFilter, Prisma.AlbumWhereInput>
@@ -308,6 +364,13 @@ export type PhotoOrderByWithRelationInput = {
   live_mp4_url?: Prisma.SortOrderInput | Prisma.SortOrder
   date?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_make?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_model?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_lens?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_f_number?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_exposure?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_iso?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_focal?: Prisma.SortOrderInput | Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   album?: Prisma.AlbumOrderByWithRelationInput
@@ -330,6 +393,13 @@ export type PhotoWhereUniqueInput = Prisma.AtLeast<{
   live_mp4_url?: Prisma.StringNullableFilter<"Photo"> | string | null
   date?: Prisma.StringNullableFilter<"Photo"> | string | null
   location?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_make?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_model?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_lens?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_f_number?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_exposure?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_iso?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_focal?: Prisma.StringNullableFilter<"Photo"> | string | null
   sort_order?: Prisma.IntFilter<"Photo"> | number
   created_at?: Prisma.DateTimeFilter<"Photo"> | Date | string
   album?: Prisma.XOR<Prisma.AlbumScalarRelationFilter, Prisma.AlbumWhereInput>
@@ -348,6 +418,13 @@ export type PhotoOrderByWithAggregationInput = {
   live_mp4_url?: Prisma.SortOrderInput | Prisma.SortOrder
   date?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_make?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_model?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_lens?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_f_number?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_exposure?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_iso?: Prisma.SortOrderInput | Prisma.SortOrder
+  exif_focal?: Prisma.SortOrderInput | Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   _count?: Prisma.PhotoCountOrderByAggregateInput
@@ -372,6 +449,13 @@ export type PhotoScalarWhereWithAggregatesInput = {
   live_mp4_url?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
   date?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
   location?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
+  exif_make?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
+  exif_model?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
+  exif_lens?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
+  exif_f_number?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
+  exif_exposure?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
+  exif_iso?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
+  exif_focal?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
   sort_order?: Prisma.IntWithAggregatesFilter<"Photo"> | number
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Photo"> | Date | string
 }
@@ -385,6 +469,13 @@ export type PhotoCreateInput = {
   live_mp4_url?: string | null
   date?: string | null
   location?: string | null
+  exif_make?: string | null
+  exif_model?: string | null
+  exif_lens?: string | null
+  exif_f_number?: string | null
+  exif_exposure?: string | null
+  exif_iso?: string | null
+  exif_focal?: string | null
   sort_order?: number
   created_at?: Date | string
   album: Prisma.AlbumCreateNestedOneWithoutPhotosInput
@@ -403,6 +494,13 @@ export type PhotoUncheckedCreateInput = {
   live_mp4_url?: string | null
   date?: string | null
   location?: string | null
+  exif_make?: string | null
+  exif_model?: string | null
+  exif_lens?: string | null
+  exif_f_number?: string | null
+  exif_exposure?: string | null
+  exif_iso?: string | null
+  exif_focal?: string | null
   sort_order?: number
   created_at?: Date | string
 }
@@ -416,6 +514,13 @@ export type PhotoUpdateInput = {
   live_mp4_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_make?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_lens?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_f_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_exposure?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_iso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_focal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   album?: Prisma.AlbumUpdateOneRequiredWithoutPhotosNestedInput
@@ -434,6 +539,13 @@ export type PhotoUncheckedUpdateInput = {
   live_mp4_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_make?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_lens?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_f_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_exposure?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_iso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_focal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -450,6 +562,13 @@ export type PhotoCreateManyInput = {
   live_mp4_url?: string | null
   date?: string | null
   location?: string | null
+  exif_make?: string | null
+  exif_model?: string | null
+  exif_lens?: string | null
+  exif_f_number?: string | null
+  exif_exposure?: string | null
+  exif_iso?: string | null
+  exif_focal?: string | null
   sort_order?: number
   created_at?: Date | string
 }
@@ -463,6 +582,13 @@ export type PhotoUpdateManyMutationInput = {
   live_mp4_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_make?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_lens?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_f_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_exposure?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_iso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_focal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -479,6 +605,13 @@ export type PhotoUncheckedUpdateManyInput = {
   live_mp4_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_make?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_lens?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_f_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_exposure?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_iso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_focal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -511,6 +644,13 @@ export type PhotoCountOrderByAggregateInput = {
   live_mp4_url?: Prisma.SortOrder
   date?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  exif_make?: Prisma.SortOrder
+  exif_model?: Prisma.SortOrder
+  exif_lens?: Prisma.SortOrder
+  exif_f_number?: Prisma.SortOrder
+  exif_exposure?: Prisma.SortOrder
+  exif_iso?: Prisma.SortOrder
+  exif_focal?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
 }
@@ -534,6 +674,13 @@ export type PhotoMaxOrderByAggregateInput = {
   live_mp4_url?: Prisma.SortOrder
   date?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  exif_make?: Prisma.SortOrder
+  exif_model?: Prisma.SortOrder
+  exif_lens?: Prisma.SortOrder
+  exif_f_number?: Prisma.SortOrder
+  exif_exposure?: Prisma.SortOrder
+  exif_iso?: Prisma.SortOrder
+  exif_focal?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
 }
@@ -550,6 +697,13 @@ export type PhotoMinOrderByAggregateInput = {
   live_mp4_url?: Prisma.SortOrder
   date?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  exif_make?: Prisma.SortOrder
+  exif_model?: Prisma.SortOrder
+  exif_lens?: Prisma.SortOrder
+  exif_f_number?: Prisma.SortOrder
+  exif_exposure?: Prisma.SortOrder
+  exif_iso?: Prisma.SortOrder
+  exif_focal?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
 }
@@ -662,6 +816,13 @@ export type PhotoCreateWithoutAlbumInput = {
   live_mp4_url?: string | null
   date?: string | null
   location?: string | null
+  exif_make?: string | null
+  exif_model?: string | null
+  exif_lens?: string | null
+  exif_f_number?: string | null
+  exif_exposure?: string | null
+  exif_iso?: string | null
+  exif_focal?: string | null
   sort_order?: number
   created_at?: Date | string
   category?: Prisma.PhotoCategoryCreateNestedOneWithoutPhotosInput
@@ -678,6 +839,13 @@ export type PhotoUncheckedCreateWithoutAlbumInput = {
   live_mp4_url?: string | null
   date?: string | null
   location?: string | null
+  exif_make?: string | null
+  exif_model?: string | null
+  exif_lens?: string | null
+  exif_f_number?: string | null
+  exif_exposure?: string | null
+  exif_iso?: string | null
+  exif_focal?: string | null
   sort_order?: number
   created_at?: Date | string
 }
@@ -723,6 +891,13 @@ export type PhotoScalarWhereInput = {
   live_mp4_url?: Prisma.StringNullableFilter<"Photo"> | string | null
   date?: Prisma.StringNullableFilter<"Photo"> | string | null
   location?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_make?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_model?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_lens?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_f_number?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_exposure?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_iso?: Prisma.StringNullableFilter<"Photo"> | string | null
+  exif_focal?: Prisma.StringNullableFilter<"Photo"> | string | null
   sort_order?: Prisma.IntFilter<"Photo"> | number
   created_at?: Prisma.DateTimeFilter<"Photo"> | Date | string
 }
@@ -736,6 +911,13 @@ export type PhotoCreateWithoutCategoryInput = {
   live_mp4_url?: string | null
   date?: string | null
   location?: string | null
+  exif_make?: string | null
+  exif_model?: string | null
+  exif_lens?: string | null
+  exif_f_number?: string | null
+  exif_exposure?: string | null
+  exif_iso?: string | null
+  exif_focal?: string | null
   sort_order?: number
   created_at?: Date | string
   album: Prisma.AlbumCreateNestedOneWithoutPhotosInput
@@ -752,6 +934,13 @@ export type PhotoUncheckedCreateWithoutCategoryInput = {
   live_mp4_url?: string | null
   date?: string | null
   location?: string | null
+  exif_make?: string | null
+  exif_model?: string | null
+  exif_lens?: string | null
+  exif_f_number?: string | null
+  exif_exposure?: string | null
+  exif_iso?: string | null
+  exif_focal?: string | null
   sort_order?: number
   created_at?: Date | string
 }
@@ -793,6 +982,13 @@ export type PhotoCreateManyAlbumInput = {
   live_mp4_url?: string | null
   date?: string | null
   location?: string | null
+  exif_make?: string | null
+  exif_model?: string | null
+  exif_lens?: string | null
+  exif_f_number?: string | null
+  exif_exposure?: string | null
+  exif_iso?: string | null
+  exif_focal?: string | null
   sort_order?: number
   created_at?: Date | string
 }
@@ -806,6 +1002,13 @@ export type PhotoUpdateWithoutAlbumInput = {
   live_mp4_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_make?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_lens?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_f_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_exposure?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_iso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_focal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.PhotoCategoryUpdateOneWithoutPhotosNestedInput
@@ -822,6 +1025,13 @@ export type PhotoUncheckedUpdateWithoutAlbumInput = {
   live_mp4_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_make?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_lens?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_f_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_exposure?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_iso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_focal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -837,6 +1047,13 @@ export type PhotoUncheckedUpdateManyWithoutAlbumInput = {
   live_mp4_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_make?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_lens?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_f_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_exposure?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_iso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_focal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -852,6 +1069,13 @@ export type PhotoCreateManyCategoryInput = {
   live_mp4_url?: string | null
   date?: string | null
   location?: string | null
+  exif_make?: string | null
+  exif_model?: string | null
+  exif_lens?: string | null
+  exif_f_number?: string | null
+  exif_exposure?: string | null
+  exif_iso?: string | null
+  exif_focal?: string | null
   sort_order?: number
   created_at?: Date | string
 }
@@ -865,6 +1089,13 @@ export type PhotoUpdateWithoutCategoryInput = {
   live_mp4_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_make?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_lens?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_f_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_exposure?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_iso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_focal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   album?: Prisma.AlbumUpdateOneRequiredWithoutPhotosNestedInput
@@ -881,6 +1112,13 @@ export type PhotoUncheckedUpdateWithoutCategoryInput = {
   live_mp4_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_make?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_lens?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_f_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_exposure?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_iso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_focal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -896,6 +1134,13 @@ export type PhotoUncheckedUpdateManyWithoutCategoryInput = {
   live_mp4_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_make?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_lens?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_f_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_exposure?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_iso?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exif_focal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -914,6 +1159,13 @@ export type PhotoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   live_mp4_url?: boolean
   date?: boolean
   location?: boolean
+  exif_make?: boolean
+  exif_model?: boolean
+  exif_lens?: boolean
+  exif_f_number?: boolean
+  exif_exposure?: boolean
+  exif_iso?: boolean
+  exif_focal?: boolean
   sort_order?: boolean
   created_at?: boolean
   album?: boolean | Prisma.AlbumDefaultArgs<ExtArgs>
@@ -934,11 +1186,18 @@ export type PhotoSelectScalar = {
   live_mp4_url?: boolean
   date?: boolean
   location?: boolean
+  exif_make?: boolean
+  exif_model?: boolean
+  exif_lens?: boolean
+  exif_f_number?: boolean
+  exif_exposure?: boolean
+  exif_iso?: boolean
+  exif_focal?: boolean
   sort_order?: boolean
   created_at?: boolean
 }
 
-export type PhotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "album_id" | "image_url" | "image_alt" | "title" | "description" | "category_id" | "is_live" | "live_mp4_url" | "date" | "location" | "sort_order" | "created_at", ExtArgs["result"]["photo"]>
+export type PhotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "album_id" | "image_url" | "image_alt" | "title" | "description" | "category_id" | "is_live" | "live_mp4_url" | "date" | "location" | "exif_make" | "exif_model" | "exif_lens" | "exif_f_number" | "exif_exposure" | "exif_iso" | "exif_focal" | "sort_order" | "created_at", ExtArgs["result"]["photo"]>
 export type PhotoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   album?: boolean | Prisma.AlbumDefaultArgs<ExtArgs>
   category?: boolean | Prisma.Photo$categoryArgs<ExtArgs>
@@ -962,6 +1221,13 @@ export type $PhotoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     live_mp4_url: string | null
     date: string | null
     location: string | null
+    exif_make: string | null
+    exif_model: string | null
+    exif_lens: string | null
+    exif_f_number: string | null
+    exif_exposure: string | null
+    exif_iso: string | null
+    exif_focal: string | null
     sort_order: number
     created_at: Date
   }, ExtArgs["result"]["photo"]>
@@ -1346,6 +1612,13 @@ export interface PhotoFieldRefs {
   readonly live_mp4_url: Prisma.FieldRef<"Photo", 'String'>
   readonly date: Prisma.FieldRef<"Photo", 'String'>
   readonly location: Prisma.FieldRef<"Photo", 'String'>
+  readonly exif_make: Prisma.FieldRef<"Photo", 'String'>
+  readonly exif_model: Prisma.FieldRef<"Photo", 'String'>
+  readonly exif_lens: Prisma.FieldRef<"Photo", 'String'>
+  readonly exif_f_number: Prisma.FieldRef<"Photo", 'String'>
+  readonly exif_exposure: Prisma.FieldRef<"Photo", 'String'>
+  readonly exif_iso: Prisma.FieldRef<"Photo", 'String'>
+  readonly exif_focal: Prisma.FieldRef<"Photo", 'String'>
   readonly sort_order: Prisma.FieldRef<"Photo", 'Int'>
   readonly created_at: Prisma.FieldRef<"Photo", 'DateTime'>
 }

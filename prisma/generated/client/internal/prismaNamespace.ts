@@ -1072,6 +1072,13 @@ export const PhotoScalarFieldEnum = {
   live_mp4_url: 'live_mp4_url',
   date: 'date',
   location: 'location',
+  exif_make: 'exif_make',
+  exif_model: 'exif_model',
+  exif_lens: 'exif_lens',
+  exif_f_number: 'exif_f_number',
+  exif_exposure: 'exif_exposure',
+  exif_iso: 'exif_iso',
+  exif_focal: 'exif_focal',
   sort_order: 'sort_order',
   created_at: 'created_at'
 } as const
@@ -1213,7 +1220,14 @@ export const PhotoOrderByRelevanceFieldEnum = {
   description: 'description',
   live_mp4_url: 'live_mp4_url',
   date: 'date',
-  location: 'location'
+  location: 'location',
+  exif_make: 'exif_make',
+  exif_model: 'exif_model',
+  exif_lens: 'exif_lens',
+  exif_f_number: 'exif_f_number',
+  exif_exposure: 'exif_exposure',
+  exif_iso: 'exif_iso',
+  exif_focal: 'exif_focal'
 } as const
 
 export type PhotoOrderByRelevanceFieldEnum = (typeof PhotoOrderByRelevanceFieldEnum)[keyof typeof PhotoOrderByRelevanceFieldEnum]
