@@ -113,7 +113,6 @@ export async function updatePhoto(
     sort_order?: number;
   },
 ): Promise<void> {
-  console.log('更新照片', id, data);
   await prisma.photo.update({
     where: { id },
     data: {
