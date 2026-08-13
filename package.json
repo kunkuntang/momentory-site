@@ -8,9 +8,12 @@
     "start": "next start",
     "init-db": "node -r tsx src/scripts/initDb.ts",
     "reset-db": "pnpm run init-db",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:generate": "node -r tsx src/scripts/safe-prisma.ts generate",
+    "prisma:migrate": "node -r tsx src/scripts/safe-prisma.ts migrate dev",
+    "prisma:migrate:deploy": "node -r tsx src/scripts/safe-prisma.ts migrate deploy",
+    "prisma:validate": "node -r tsx src/scripts/safe-prisma.ts validate",
+    "prisma:studio": "node -r tsx src/scripts/safe-prisma.ts studio",
+    "prisma:status": "node -r tsx src/scripts/safe-prisma.ts migrate status"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

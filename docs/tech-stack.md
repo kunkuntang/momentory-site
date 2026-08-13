@@ -26,13 +26,23 @@ Momentory 是一个基于 Next.js 构建的相册展示网站，采用现代化�
 | 技术 | 版本 | 说明 |
 | ---- | ---- | ---- |
 | MySQL | 8.0+ | 关系型数据库管理系统 |
-| mysql2 | ^3.10.0 | 高性能 MySQL 驱动（Promise API） |
+| Prisma | ^7.8.0 | 下一代 ORM，类型安全的数据库访问 |
+| @prisma/client | ^7.8.0 | Prisma Client（自动生成的类型安全客户端） |
+| @prisma/adapter-mariadb | ^7.8.0 | Prisma MariaDB/MySQL 连接适配器 |
 
 **数据库配置**:
 - 字符集: `utf8mb4`
 - 排序规则: `utf8mb4_unicode_ci`
 - 存储引擎: InnoDB
-- 连接池: 最大连接数 10
+- ORM 模式: Prisma Schema 定义模型 → 生成 Prisma Client → Repository 封装查询
+
+**Prisma 配置文件**:
+| 文件 | 作用 |
+| ---- | ---- |
+| `prisma/schema.prisma` | 数据模型定义（9 张表） |
+| `prisma.config.ts` | Prisma CLI 配置 |
+| `src/lib/prisma.ts` | Prisma Client 初始化（MariaDB Adapter） |
+| `src/scripts/safe-prisma.ts` | Prisma 命令安全包装脚本（生产环境拦截） |
 
 **环境变量**:
 ```bash
@@ -41,6 +51,12 @@ DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME=momentory
+
+# Prisma 连接字符串
+DATABASE_URL="mysql://root:your_password@localhost:3306/momentory"
+
+# 环境标识（PROD=生产环境，触发安全保护）
+APP_ENV=DEV
 ```
 
 ## 样式方案
@@ -106,41 +122,50 @@ DB_NAME=momentory
 ## 项目结构
 
 ```
+├── prisma/                      # Prisma ORM 目录
+│   ├── schema.prisma            # 数据模型定义（9 张表）
+│   └── generated/client/        # 自动生成的 Prisma Client
+├── prisma.config.ts             # Prisma CLI 配置
 ├── sql/                         # SQL 脚本目录
-│   └── init.sql                 # 数据库初始化脚本（MySQL）
+│   ├── schema.sql               # 建表 SQL（开发用）
+│   └── seed-data.sql            # 初始数据 SQL（开发用）
 ├── src/
 │   ├── app/                     # Next.js App Router 路由
-│   │   ├── about/               # 关于页面
-│   │   ├── albums/              # 相册页面
+│   │   ├── (site)/              # 公开站点路由
+│   │   ├── admin/               # 管理后台路由
+│   │   ├── api/                 # API 路由
 │   │   ├── layout.tsx           # 根布局
 │   │   └── page.tsx             # 首页
 │   ├── components/              # 可复用组件
+│   │   ├── admin/               # 管理后台组件
 │   │   ├── Header/              # 头部导航
 │   │   ├── Footer/              # 页脚
-│   │   ├── Layout/              # 布局组件
 │   │   ├── AlbumCard/           # 相册卡片
 │   │   ├── AlbumAccessGate/     # 相册访问权限门
-│   │   ├── PageHero/            # 页面英雄区
-│   │   ├── SectionHeader/       # 区块标题
-│   │   └── TextLink/            # 文本链接
+│   │   └── ...
 │   ├── views/                   # 页面视图组件
 │   │   ├── HomePage/            # 首页视图
 │   │   ├── AlbumsPage/          # 相册列表视图
 │   │   ├── AlbumDetailPage/     # 相册详情视图
 │   │   └── AboutPage/           # 关于页面视图
-│   ├── data/                    # 静态数据
-│   │   └── siteData.ts          # 站点配置数据
+│   ├── data/                    # 数据聚合层
+│   │   └── siteData.ts          # 站点数据聚合
 │   ├── lib/                     # 工具库
-│   │   └── database.ts          # 数据库连接封装
-│   ├── scripts/                 # 脚本
-│   │   └── initDb.ts            # 数据库初始化脚本
+│   │   ├── prisma.ts            # Prisma Client 实例
+│   │   ├── auth.ts              # JWT 认证
+│   │   ├── cos.ts               # COS 对象存储
+│   │   ├── exif.ts              # EXIF 解析
+│   │   ├── api.ts               # API 响应封装
+│   │   └── repositories/        # 数据访问层（8 个 Repository）
+│   ├── scripts/                 # 脚本目录
+│   │   ├── safe-prisma.ts       # Prisma 命令安全包装（生产环境拦截）
+│   │   └── initDb.ts            # 数据库初始化脚本（开发用）
 │   ├── styles/                  # 全局样式
 │   │   └── global.css           # 全局 CSS
 │   └── types/                   # 类型定义
 │       └── global.d.ts          # 全局类型声明
-├── cb.config.js                 # 部署配置
-├── tmc.config.js                # 部署配置
-├── next.config.ts               # Next.js 配置
+├── tmc.config.js                # 腾讯云部署配置
+├── next.config.ts               # Next.js 配置（含安全头）
 └── tsconfig.json                # TypeScript 配置
 ```
 
@@ -165,13 +190,51 @@ DB_NAME=momentory
 
 ## 常用命令
 
+### 基础命令
+
 | 命令 | 说明 |
 | ---- | ---- |
 | `pnpm run dev` | 启动开发服务器 |
 | `pnpm run build` | 构建生产版本 |
 | `pnpm run start` | 启动生产服务器 |
-| `pnpm run init-db` | 初始化数据库 |
-| `pnpm run reset-db` | 重置数据库 |
+
+### 数据库命令（开发环境）
+
+以下命令仅在开发环境（NODE_ENV≠production 且 APP_ENV≠PROD）可用：
+
+| 命令 | 说明 | 生产环境可用 |
+| ---- | ---- | ----------- |
+| `pnpm run init-db` | 初始化数据库（建表 + 种子数据 + 创建管理员） | ❌ 会被拦截 |
+| `pnpm run reset-db` | 重置数据库（同 init-db，清空后重新初始化） | ❌ 会被拦截 |
+| `pnpm run prisma:migrate --name xxx` | 创建迁移文件并同步本地数据库 | ❌ 会被拦截 |
+| `pnpm run prisma:studio` | 打开 Prisma Studio 可视化界面 | ❌ 会被拦截 |
+
+### Prisma 命令（通用 / 生产安全）
+
+| 命令 | 说明 | 生产环境可用 |
+| ---- | ---- | ----------- |
+| `pnpm run prisma:generate` | 生成 Prisma Client（类型代码） | ✅ 安全 |
+| `pnpm run prisma:validate` | 验证 prisma/schema.prisma 语法 | ✅ 安全 |
+| `pnpm run prisma:status` | 查看数据库迁移状态 | ✅ 安全 |
+| `pnpm run prisma:migrate:deploy` | **生产部署迁移**：仅执行已有的迁移 SQL | ✅ **生产推荐** |
+
+### 表结构变更标准流程
+
+```
+开发环境：修改 schema.prisma → pnpm run prisma:migrate --name xxx → 测试 → 提交代码
+                                                              ↓
+生产环境：拉取代码 → pnpm run prisma:migrate:deploy → pnpm run prisma:generate → 重启服务
+```
+
+### 环境变量与安全触发
+
+| 环境变量组合 | 是否触发安全保护 | 说明 |
+| ----------- | --------------- | ---- |
+| NODE_ENV=production | 是 | 标准生产环境 |
+| NODE_ENV=prod | 是 | 生产环境简写 |
+| APP_ENV=PROD | 是 | 当前 .env 默认设置 |
+| APP_ENV=PRODUCTION | 是 | 生产环境 |
+| NODE_ENV=development + APP_ENV=DEV | 否 | 正常开发环境 |
 
 ## 代码规范
 
@@ -189,9 +252,14 @@ DB_NAME=momentory
 
 ### 数据库规范
 
-- 数据库操作仅在服务端进行
-- 数据库连接通过 `src/lib/database.ts` 管理
-- SQL 脚本存放于 `sql/` 目录
+- 数据库操作仅在服务端进行，禁止在客户端组件（`'use client'`）中导入 Repository 或 Prisma Client
+- 通过 `src/lib/prisma.ts` 管理 Prisma Client 单例，开发环境启用全局缓存避免重复连接
+- 所有数据库查询通过 `src/lib/repositories/` 下的 Repository 封装，优先使用 Prisma 类型安全 API
+- 数据库表结构通过 Prisma Migrate 管理：
+  - Schema 定义文件: `prisma/schema.prisma`
+  - 迁移 SQL 文件存放在 `prisma/migrations/` 目录，随代码一同提交到 Git
+  - 开发环境: `prisma migrate dev` 生成迁移；生产环境: `prisma migrate deploy` 执行迁移
+- 开发环境初始化脚本 (`sql/` 目录) 仅用于本地从零创建，生产环境禁用
 
 ## 性能优化
 

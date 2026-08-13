@@ -2,7 +2,7 @@
 
 ## 概述
 
-Momentory 是一个基于 Next.js 构建的相册展示网站，采用服务端渲染（SSR）与客户端交互相结合的方式，数据存储于 MySQL 8.0 数据库，通过 Repository 模式进行异步数据访问。项目遵循清晰的分层架构，代码组织严谨，便于维护和扩展。
+Momentory 是一个基于 Next.js 构建的相册展示网站，采用服务端渲染（SSR）与客户端交互相结合的方式，数据存储于 MySQL 8.0 数据库，使用 Prisma ORM v7 进行类型安全的数据库操作，通过 Repository 模式封装异步数据访问。项目遵循清晰的分层架构，代码组织严谨，内置生产环境安全防护机制，便于维护和扩展。
 
 ## 架构总览
 
@@ -56,7 +56,9 @@ Momentory 是一个基于 Next.js 构建的相册展示网站，采用服务端�
 
 | 目录/文件 | 作用 | 说明 |
 | --------- | ---- | ---- |
-| `sql/` | SQL 脚本目录 | 存放数据库初始化脚本 |
+| `prisma/` | Prisma ORM 目录 | Schema 定义、迁移文件、生成的 Client |
+| `prisma.config.ts` | Prisma 配置 | Prisma CLI 配置文件 |
+| `sql/` | SQL 脚本目录 | 存放数据库初始化脚本（schema + seed） |
 | `src/` | 源代码目录 | 项目核心代码 |
 | `docs/` | 文档目录 | 项目文档（技术栈、数据库设计、架构） |
 | `.gitignore` | Git 忽略配置 | 指定 Git 不应跟踪的文件 |
@@ -64,20 +66,34 @@ Momentory 是一个基于 Next.js 构建的相册展示网站，采用服务端�
 | `tsconfig.json` | TypeScript 配置 | TypeScript 编译选项 |
 | `package.json` | 项目依赖配置 | 包含脚本命令和依赖声明 |
 | `tmc.config.js` | 腾讯云部署配置 | tmc-cli 部署到腾讯云 COS 的配置文件 |
-| `cb.config.js` | 构建配置 | 前端构建工具的配置文件 |
+
+### prisma/ - Prisma ORM 目录
+
+```
+prisma/
+├── schema.prisma             # Prisma 数据模型定义（9 张数据表）
+├── prisma.config.ts          # Prisma CLI 配置（datasource 指向 schema.prisma）
+├── generated/client/         # 自动生成的 Prisma Client（类型安全，请勿手动修改）
+└── migrations/               # 迁移 SQL 文件目录（每个变更独立子目录）
+```
+
+- **职责**: 作为数据库交互的核心层
+- **schema.prisma**: 定义 Album、Photo、PhotoCategory、HomeCarousel、FeaturedPhoto、SiteConfig、Menu、UserRole、User 共 9 个模型
+- **Prisma Client**: 自动生成 TypeScript 类型，提供 `$queryRaw`、`$executeRawUnsafe` 等原始 SQL 能力
+- **迁移记录**: `pnpm run prisma:migrate --name xxx` 生成，`pnpm run prisma:migrate:deploy` 在生产环境执行
 
 ### sql/ - SQL 脚本目录
 
 ```
 sql/
-└── init.sql              # 数据库初始化脚本
+├── schema.sql              # 建表 SQL（开发环境 init-db 使用）
+└── seed-data.sql           # 初始数据 SQL（开发环境 init-db 使用）
 ```
 
-- **职责**: 定义数据库表结构和初始数据
-- **内容**: 
-  - 表创建语句（albums, photos, photo_categories 等）
-  - 初始数据插入（相册、分类、轮播图、精选照片、站点配置、菜单）
-- **执行**: 通过 `pnpm run init-db` 命令执行
+- **职责**: 开发环境初始化数据库表结构和种子数据
+- **执行条件**: 仅在开发环境（NODE_ENV≠production 且 APP_ENV≠PROD）可用
+- **生产环境替代方案**: 使用 Prisma Migrate Deploy 执行已有的迁移文件
+- **执行命令**: 通过 `pnpm run init-db` 命令执行（生产环境自动拦截）
 
 ### src/ - 源代码目录
 
@@ -165,48 +181,77 @@ src/data/
 
 ```
 src/lib/
-├── database.ts           # 数据库连接封装（MySQL 连接池）
-└── repositories/
+├── prisma.ts             # Prisma Client 实例（MariaDB Adapter）
+├── auth.ts               # 认证与权限（JWT + bcryptjs）
+├── cos.ts                # 腾讯云 COS 对象存储封装
+├── exif.ts               # 图片 EXIF 信息解析
+├── api.ts                # API 响应封装
+└── repositories/         # 数据访问层（Repository 模式）
     ├── albums.ts         # 相册数据访问
+    ├── photos.ts         # 照片数据访问
+    ├── photoCategories.ts# 照片分类数据访问
     ├── featuredPhotos.ts # 精选照片数据访问
     ├── homeCarousel.ts   # 首页轮播图数据访问
-    └── siteConfig.ts     # 站点配置数据访问
+    ├── siteConfig.ts     # 站点配置 + 菜单数据访问
+    ├── users.ts          # 用户数据访问
+    └── userRoles.ts      # 用户角色 + 权限数据访问
 ```
 
-**database.ts**
+**prisma.ts**
 
-- **职责**: 初始化和管理 MySQL 数据库连接池
-- **配置**: 
-  - 字符集: `utf8mb4`
-  - 排序规则: `utf8mb4_unicode_ci`
-  - 存储引擎: InnoDB
-  - 连接池: 最大连接数 10
-- **导出**: `prepare`, `exec`, `close` 方法
+- **职责**: 初始化 Prisma Client 并集成 MariaDB Adapter
+- **核心配置**: 
+  - 使用 `@prisma/adapter-mariadb` 连接 MySQL（兼容 MariaDB 协议）
+  - 环境变量: `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME`
+  - 开发环境启用 `globalThis.prisma` 全局缓存，避免热更新创建过多连接
+- **导出**: 单例 `PrismaClient` 实例
 
 **repositories/**
 
 - **职责**: 实现数据访问层（Repository 模式）
 - **设计原则**: 
   - 每个 Repository 对应一个或一组相关数据表
-  - 封装 SQL 查询逻辑，提供类型安全的异步 API
-  - 仅在服务端执行，确保数据库安全
-- **示例接口**: 
-  - `getAllAlbums()`: 获取所有相册（异步）
-  - `getAlbumBySlug(slug)`: 按别名获取相册（含照片）（异步）
-  - `getActiveCarouselItems()`: 获取启用的轮播图（异步）
+  - 优先使用 Prisma 类型安全查询，必要时通过 `$queryRaw` / `$executeRawUnsafe` 执行原生 SQL
+  - 仅在服务端执行，确保数据库连接信息不暴露给客户端
+- **Repository 列表**:
+  | 文件 | 对应表 | 主要方法 |
+  | ---- | ------ | -------- |
+  | albums.ts | albums | getAllAlbums, getAlbumBySlug, create, update, delete |
+  | photos.ts | photos, photo_categories | getPhotos, getPhotoById, create, update, delete, getCategories |
+  | homeCarousel.ts | home_carousel | getActiveCarouselItems, getAllCarousel, create, update, delete |
+  | featuredPhotos.ts | featured_photos | getActiveFeaturedPhotos, getAllFeatured, create, update, delete |
+  | siteConfig.ts | site_config, menu | getSiteConfig, updateSiteConfig, menu CRUD |
+  | users.ts | users | login, getAllUsers, getUserById, create, update, delete |
+  | userRoles.ts | user_roles | getAllRoles, getRoleById, create, update, delete, checkPermission |
 
 #### src/scripts/ - 脚本目录
 
 ```
 src/scripts/
-└── initDb.ts             # 数据库初始化脚本
+├── safe-prisma.ts        # Prisma 命令安全包装脚本（生产环境拦截危险命令）
+└── initDb.ts             # 数据库初始化脚本（开发环境，生产环境自动拦截）
 ```
 
-- **职责**: 执行数据库初始化逻辑
-- **功能**: 
-  - 读取 `sql/init.sql` 脚本
-  - 执行建表和数据插入操作（异步）
-- **执行**: 通过 `pnpm run init-db` 命令调用
+**safe-prisma.ts**
+
+- **职责**: 在执行 Prisma 命令前检查环境，拦截生产环境下的危险操作
+- **双重环境检测**: 
+  - `NODE_ENV === 'production' | 'prod'` → 触发保护
+  - `APP_ENV === 'PROD' | 'PRODUCTION'` → 触发保护
+- **被拦截的命令**: `migrate dev`, `migrate reset`, `db push`, `db seed`, `studio`
+- **允许通过的命令**: `generate`, `migrate deploy`, `migrate status`, `validate`
+- **实现机制**: 通过 `child_process.spawnSync` 转发放行的 Prisma 命令到真实 prisma 二进制
+
+**initDb.ts**
+
+- **职责**: 开发环境初始化数据库（建表 + 插入种子数据 + 创建超级管理员）
+- **生产环境保护**: 脚本开头检查环境变量，若为生产环境立即退出并打印错误提示
+- **执行流程**:
+  1. 环境检查（NODE_ENV / APP_ENV）
+  2. 读取并执行 `sql/schema.sql` 建表
+  3. 读取并执行 `sql/seed-data.sql` 插入初始数据
+  4. 使用 bcryptjs 哈希管理员密码，通过 Prisma `user.upsert` 创建/更新账号
+  5. 断开 Prisma 连接
 
 #### src/styles/ - 全局样式
 
@@ -336,16 +381,46 @@ src/types/
 - **实现**: 
   - Repository 文件不导出到客户端组件
   - 使用 Next.js App Router 默认的服务端执行环境
+  - Prisma Client 仅在 `src/lib/prisma.ts` 中初始化，通过 Repository 封装后间接调用
 
 ### 环境变量管理
 
 - **规则**: 数据库连接信息（用户名、密码、主机）通过环境变量配置
 - **实现**: `.env.local` 文件存放敏感配置，通过 `.gitignore` 排除
+- **生产环境双重标识**: 
+  - `NODE_ENV=production` - Node.js 标准生产环境标识
+  - `APP_ENV=PROD` - 项目自定义生产环境标识，用于触发额外安全保护
 
 ### 私有相册保护
 
 - **规则**: 标记为私有的相册需要访问权限验证
 - **实现**: `AlbumAccessGate` 组件控制访问
+
+### 生产环境数据库操作安全防护
+
+- **核心目标**: 防止在生产环境误执行会修改表结构或清空数据的危险命令
+- **防护实现**: 
+  1. **Prisma 命令安全包装**: `src/scripts/safe-prisma.ts` 在执行前拦截危险命令
+  2. **初始化脚本保护**: `src/scripts/initDb.ts` 开头进行环境检测，生产环境直接退出
+- **双重环境检测规则（任一满足即触发保护）**:
+  | 环境变量 | 触发值 |
+  | -------- | ------ |
+  | NODE_ENV | production / prod |
+  | APP_ENV | PROD / PRODUCTION |
+- **被拦截的危险命令清单**:
+  | 命令 | 风险 |
+  | ---- | ---- |
+  | prisma migrate dev | 可能要求重置数据库，数据丢失风险 |
+  | prisma migrate reset | 会清空所有数据表，**绝对禁止** |
+  | prisma db push | 强制推送 schema，可能重建表且无迁移记录 |
+  | prisma db seed | 种子数据填充可能覆盖生产数据 |
+  | prisma studio | 可视化工具暴露数据库操作入口 |
+  | pnpm run init-db | 执行 DROP/CREATE TABLE，数据全部丢失 |
+  | pnpm run reset-db | init-db 别名，同上 |
+- **生产环境变更规范**:
+  - 开发环境执行 `prisma migrate dev` 生成迁移文件
+  - 迁移文件提交 Git 并随代码部署一同发布
+  - 生产环境执行 `prisma migrate deploy` 仅执行新的迁移 SQL
 
 ## 性能优化策略
 

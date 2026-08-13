@@ -3,6 +3,34 @@ import { join } from 'path';
 import bcrypt from 'bcryptjs';
 import prisma from '../lib/prisma';
 
+const PRODUCTION_ENVS = ['production', 'prod'];
+const PRODUCTION_APP_ENVS = ['PROD', 'PRODUCTION'];
+
+function isProduction(): boolean {
+  const nodeEnv = (process.env.NODE_ENV || '').toLowerCase();
+  const appEnv = (process.env.APP_ENV || '').toUpperCase();
+  return PRODUCTION_ENVS.includes(nodeEnv) || PRODUCTION_APP_ENVS.includes(appEnv);
+}
+
+if (isProduction()) {
+  console.error('========================================');
+  console.error('  ERROR: init-db script blocked in production!');
+  console.error('========================================');
+  console.error('');
+  console.error('This script will DROP and RECREATE all tables,');
+  console.error('causing PERMANENT DATA LOSS.');
+  console.error('');
+  console.error('Current environment detection:');
+  console.error(`  - NODE_ENV: ${process.env.NODE_ENV || '(not set)'}`);
+  console.error(`  - APP_ENV:  ${process.env.APP_ENV || '(not set)'}`);
+  console.error('');
+  console.error('For production database setup, use safe migration procedures:');
+  console.error('  1. pnpm run prisma:migrate:deploy  (execute existing migrations)');
+  console.error('  2. Manually create admin user via SQL if needed');
+  console.error('========================================');
+  process.exit(1);
+}
+
 const schemaPath = join(process.cwd(), 'sql', 'schema.sql');
 const seedDataPath = join(process.cwd(), 'sql', 'seed-data.sql');
 
