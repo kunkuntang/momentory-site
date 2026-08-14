@@ -5,6 +5,7 @@ import PageHeader from '@/components/admin/PageHeader';
 import DataTable, { type Column } from '@/components/admin/DataTable';
 import type { PhotoWithAlbum } from '@/lib/repositories/photos';
 import PhotoFilters from './PhotoFilters';
+import { deriveResponsiveFromOriginalUrl } from '@/lib/responsive-image';
 
 export default async function PhotosPage({
   searchParams,
@@ -31,16 +32,27 @@ export default async function PhotosPage({
     {
       key: 'image_url',
       label: '缩略图',
-      render: (item) =>
-        item.image_url ? (
-          <img
-            src={item.image_url}
-            alt={item.image_alt ?? ''}
-            className="w-10 h-10 rounded object-cover"
-          />
-        ) : (
-          '-'
-        ),
+      render: (item) => {
+        if (!item.image_url) return '-';
+        const r = deriveResponsiveFromOriginalUrl(item.image_url);
+        return (
+          <picture>
+            {r.avifSrcSet && (
+              <source type="image/avif" srcSet={r.avifSrcSet} sizes="40px" />
+            )}
+            {r.webpSrcSet && (
+              <source type="image/webp" srcSet={r.webpSrcSet} sizes="40px" />
+            )}
+            <img
+              src={item.image_url}
+              alt={item.image_alt ?? ''}
+              className="w-10 h-10 rounded object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
+        );
+      },
     },
     { key: 'title', label: '标题', render: (item) => item.title ?? '-' },
     {

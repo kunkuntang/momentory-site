@@ -1,14 +1,49 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { Upload, X, RefreshCw } from 'lucide-react';
+import { deriveResponsiveFromOriginalUrl } from '@/lib/responsive-image';
+
+interface UploadResponseVariant {
+  key: string;
+  url: string;
+  width: number;
+  height: number;
+  format: string;
+  sizeBytes: number;
+  contentType: string;
+}
+
+interface UploadResponseUrls {
+  original: string;
+  webp: Record<number, string>;
+  avif: Record<number, string>;
+  widths: number[];
+}
+
+interface UploadResponseData {
+  contentHash: string;
+  original: {
+    url: string;
+    key: string;
+    width: number;
+    height: number;
+    sizeBytes: number;
+    format: string;
+  };
+  variants: UploadResponseVariant[];
+  urls: UploadResponseUrls;
+  srcset: {
+    webp: string;
+    avif: string;
+  };
+  sizes: string;
+  widths: number[];
+}
 
 interface UploadResponse {
   success: boolean;
-  data?: {
-    url: string;
-    key: string;
-  };
+  data?: UploadResponseData;
   message?: string;
 }
 
@@ -41,6 +76,11 @@ export function FileUploader({
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const responsive = useMemo(
+    () => (previewType === 'image' ? deriveResponsiveFromOriginalUrl(value ?? '') : null),
+    [previewType, value],
+  );
+
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -70,7 +110,7 @@ export function FileUploader({
         throw new Error(result.message || '上传失败');
       }
 
-      onChange?.(result.data.url, result.data.key);
+      onChange?.(result.data.original.url, result.data.original.key);
     } catch (err) {
       setError(err instanceof Error ? err.message : '上传失败');
     } finally {
@@ -108,11 +148,37 @@ export function FileUploader({
                   controls
                   className="w-full max-h-64 object-contain bg-black"
                 />
+              ) : responsive?.avifSrcSet || responsive?.webpSrcSet ? (
+                <picture>
+                  {responsive.avifSrcSet && (
+                    <source
+                      type="image/avif"
+                      srcSet={responsive.avifSrcSet}
+                      sizes={responsive.sizes}
+                    />
+                  )}
+                  {responsive.webpSrcSet && (
+                    <source
+                      type="image/webp"
+                      srcSet={responsive.webpSrcSet}
+                      sizes={responsive.sizes}
+                    />
+                  )}
+                  <img
+                    src={value}
+                    alt="已上传图片"
+                    className="w-full max-h-64 object-contain bg-gray-50"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
               ) : (
                 <img
                   src={value}
                   alt="已上传图片"
                   className="w-full max-h-64 object-contain bg-gray-50"
+                  loading="lazy"
+                  decoding="async"
                 />
               )}
               {uploading && (

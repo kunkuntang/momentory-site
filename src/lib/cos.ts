@@ -104,9 +104,16 @@ export const uploadFile = async (
   });
 };
 
+export interface UploadBufferOptions {
+  CacheControl?: string;
+  ContentType?: string;
+  Expires?: string;
+}
+
 export const uploadBuffer = async (
   buffer: Buffer,
   key: string,
+  options: UploadBufferOptions = {},
 ): Promise<CosUploadResult> => {
   const cos = createCosClient();
   const config = getConfig();
@@ -124,6 +131,9 @@ export const uploadBuffer = async (
       Region: config.Region,
       Key: _tempUrl,
       Body: buffer,
+      CacheControl: options.CacheControl,
+      ContentType: options.ContentType,
+      Expires: options.Expires,
     }, (err, data) => {
       if (err) {
         reject(err);
