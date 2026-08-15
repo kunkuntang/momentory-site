@@ -56,9 +56,9 @@ Momentory 是一个基于 Next.js 构建的相册展示网站，采用服务端�
 
 | 目录/文件 | 作用 | 说明 |
 | --------- | ---- | ---- |
-| `prisma/` | Prisma ORM 目录 | Schema 定义、迁移文件、生成的 Client |
+| `prisma/` | Prisma ORM 目录 | Schema 定义、Seed 脚本、迁移文件、生成的 Client |
 | `prisma.config.ts` | Prisma 配置 | Prisma CLI 配置文件 |
-| `sql/` | SQL 脚本目录 | 存放数据库初始化脚本（schema + seed） |
+| `sql/` | SQL 存档目录 | schema.sql / seed-data.sql 历史存档（仅参考，不再被脚本调用） |
 | `src/` | 源代码目录 | 项目核心代码 |
 | `docs/` | 文档目录 | 项目文档（技术栈、数据库设计、架构） |
 | `.gitignore` | Git 忽略配置 | 指定 Git 不应跟踪的文件 |
@@ -72,28 +72,29 @@ Momentory 是一个基于 Next.js 构建的相册展示网站，采用服务端�
 ```
 prisma/
 ├── schema.prisma             # Prisma 数据模型定义（9 张数据表）
-├── prisma.config.ts          # Prisma CLI 配置（datasource 指向 schema.prisma）
+├── seed.ts                   # Prisma Seed 脚本（类型安全写入初始数据 + 管理员）
 ├── generated/client/         # 自动生成的 Prisma Client（类型安全，请勿手动修改）
-└── migrations/               # 迁移 SQL 文件目录（每个变更独立子目录）
+└── migrations/               # 迁移 SQL 文件目录（每个变更独立子目录，随 Git 提交）
 ```
 
 - **职责**: 作为数据库交互的核心层
 - **schema.prisma**: 定义 Album、Photo、PhotoCategory、HomeCarousel、FeaturedPhoto、SiteConfig、Menu、UserRole、User 共 9 个模型
+- **seed.ts**: Prisma 官方种子脚本方式，开发环境执行 `pnpm run prisma:seed`（需 ADMIN_DEFAULT_PASSWORD）
 - **Prisma Client**: 自动生成 TypeScript 类型，提供 `$queryRaw`、`$executeRawUnsafe` 等原始 SQL 能力
 - **迁移记录**: `pnpm run prisma:migrate --name xxx` 生成，`pnpm run prisma:migrate:deploy` 在生产环境执行
 
-### sql/ - SQL 脚本目录
+### sql/ - SQL 存档目录
 
 ```
 sql/
-├── schema.sql              # 建表 SQL（开发环境 init-db 使用）
-└── seed-data.sql           # 初始数据 SQL（开发环境 init-db 使用）
+├── schema.sql              # 建表 SQL（历史存档，已由 prisma/migrations 取代）
+└── seed-data.sql           # 初始数据 SQL（历史存档，已由 prisma/seed.ts 取代）
 ```
 
-- **职责**: 开发环境初始化数据库表结构和种子数据
-- **执行条件**: 仅在开发环境（NODE_ENV≠production 且 APP_ENV≠PROD）可用
-- **生产环境替代方案**: 使用 Prisma Migrate Deploy 执行已有的迁移文件
-- **执行命令**: 通过 `pnpm run init-db` 命令执行（生产环境自动拦截）
+- **职责**: 保留历史 SQL 脚本供人工参考，不再被任何脚本自动调用
+- **生产/开发替代方案**:
+  - 建表：`pnpm run prisma:migrate --name init_db`（开发） / `pnpm run prisma:migrate:deploy`（生产）
+  - 填充数据：`ADMIN_DEFAULT_PASSWORD=xxx pnpm run prisma:seed`（开发）
 
 ### src/ - 源代码目录
 
@@ -228,8 +229,7 @@ src/lib/
 
 ```
 src/scripts/
-├── safe-prisma.ts        # Prisma 命令安全包装脚本（生产环境拦截危险命令）
-└── initDb.ts             # 数据库初始化脚本（开发环境，生产环境自动拦截）
+└── safe-prisma.ts        # Prisma 命令安全包装脚本（生产环境拦截危险命令）
 ```
 
 **safe-prisma.ts**
@@ -242,16 +242,7 @@ src/scripts/
 - **允许通过的命令**: `generate`, `migrate deploy`, `migrate status`, `validate`
 - **实现机制**: 通过 `child_process.spawnSync` 转发放行的 Prisma 命令到真实 prisma 二进制
 
-**initDb.ts**
-
-- **职责**: 开发环境初始化数据库（建表 + 插入种子数据 + 创建超级管理员）
-- **生产环境保护**: 脚本开头检查环境变量，若为生产环境立即退出并打印错误提示
-- **执行流程**:
-  1. 环境检查（NODE_ENV / APP_ENV）
-  2. 读取并执行 `sql/schema.sql` 建表
-  3. 读取并执行 `sql/seed-data.sql` 插入初始数据
-  4. 使用 bcryptjs 哈希管理员密码，通过 Prisma `user.upsert` 创建/更新账号
-  5. 断开 Prisma 连接
+> **说明**: 数据库初始化、种子数据写入由 `prisma/seed.ts` 承担，并通过 `pnpm run prisma:seed` 调用。seed 脚本内置独立的生产环境检测拦截逻辑。
 
 #### src/styles/ - 全局样式
 
@@ -415,12 +406,13 @@ src/types/
   | prisma db push | 强制推送 schema，可能重建表且无迁移记录 |
   | prisma db seed | 种子数据填充可能覆盖生产数据 |
   | prisma studio | 可视化工具暴露数据库操作入口 |
-  | pnpm run init-db | 执行 DROP/CREATE TABLE，数据全部丢失 |
-  | pnpm run reset-db | init-db 别名，同上 |
+  | pnpm run prisma:seed | seed 脚本会清空并重写全表数据（脚本内置独立生产拦截） |
 - **生产环境变更规范**:
-  - 开发环境执行 `prisma migrate dev` 生成迁移文件
-  - 迁移文件提交 Git 并随代码部署一同发布
-  - 生产环境执行 `prisma migrate deploy` 仅执行新的迁移 SQL
+  - 开发环境执行 `pnpm run prisma:migrate --name xxx` 生成迁移文件
+  - 如需调整种子数据同步修改 `prisma/seed.ts`
+  - 迁移文件 + seed.ts 提交 Git 并随代码部署一同发布
+  - 生产环境执行 `pnpm run prisma:migrate:deploy` 仅执行新的迁移 SQL
+  - 种子数据按需手动操作（不建议在生产自动执行 seed）
 
 ## 性能优化策略
 

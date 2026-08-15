@@ -124,11 +124,13 @@ APP_ENV=DEV
 ```
 ├── prisma/                      # Prisma ORM 目录
 │   ├── schema.prisma            # 数据模型定义（9 张表）
-│   └── generated/client/        # 自动生成的 Prisma Client
+│   ├── seed.ts                  # Prisma Seed 脚本（类型安全写入初始数据 + 管理员）
+│   ├── generated/client/        # 自动生成的 Prisma Client
+│   └── migrations/              # 迁移 SQL 文件目录（随 Git 提交）
 ├── prisma.config.ts             # Prisma CLI 配置
-├── sql/                         # SQL 脚本目录
-│   ├── schema.sql               # 建表 SQL（开发用）
-│   └── seed-data.sql            # 初始数据 SQL（开发用）
+├── sql/                         # SQL 存档目录（仅参考，不再被脚本调用）
+│   ├── schema.sql               # 建表 SQL（历史存档，已被 prisma/migrations 取代）
+│   └── seed-data.sql            # 初始数据 SQL（历史存档，已被 prisma/seed.ts 取代）
 ├── src/
 │   ├── app/                     # Next.js App Router 路由
 │   │   ├── (site)/              # 公开站点路由
@@ -158,8 +160,7 @@ APP_ENV=DEV
 │   │   ├── api.ts               # API 响应封装
 │   │   └── repositories/        # 数据访问层（8 个 Repository）
 │   ├── scripts/                 # 脚本目录
-│   │   ├── safe-prisma.ts       # Prisma 命令安全包装（生产环境拦截）
-│   │   └── initDb.ts            # 数据库初始化脚本（开发用）
+│   │   └── safe-prisma.ts       # Prisma 命令安全包装（生产环境拦截）
 │   ├── styles/                  # 全局样式
 │   │   └── global.css           # 全局 CSS
 │   └── types/                   # 类型定义
@@ -204,9 +205,8 @@ APP_ENV=DEV
 
 | 命令 | 说明 | 生产环境可用 |
 | ---- | ---- | ----------- |
-| `pnpm run init-db` | 初始化数据库（建表 + 种子数据 + 创建管理员） | ❌ 会被拦截 |
-| `pnpm run reset-db` | 重置数据库（同 init-db，清空后重新初始化） | ❌ 会被拦截 |
 | `pnpm run prisma:migrate --name xxx` | 创建迁移文件并同步本地数据库 | ❌ 会被拦截 |
+| `pnpm run prisma:seed` | 清空旧数据后写入种子数据 + 创建管理员（需 ADMIN_DEFAULT_PASSWORD） | ❌ 会被拦截 |
 | `pnpm run prisma:studio` | 打开 Prisma Studio 可视化界面 | ❌ 会被拦截 |
 
 ### Prisma 命令（通用 / 生产安全）
@@ -221,7 +221,7 @@ APP_ENV=DEV
 ### 表结构变更标准流程
 
 ```
-开发环境：修改 schema.prisma → pnpm run prisma:migrate --name xxx → 测试 → 提交代码
+开发环境：修改 schema.prisma → pnpm run prisma:migrate --name xxx → 更新 prisma/seed.ts → 测试 → 提交代码
                                                               ↓
 生产环境：拉取代码 → pnpm run prisma:migrate:deploy → pnpm run prisma:generate → 重启服务
 ```
@@ -232,9 +232,9 @@ APP_ENV=DEV
 | ----------- | --------------- | ---- |
 | NODE_ENV=production | 是 | 标准生产环境 |
 | NODE_ENV=prod | 是 | 生产环境简写 |
-| APP_ENV=PROD | 是 | 当前 .env 默认设置 |
+| APP_ENV=PROD | 是 | 生产环境 |
 | APP_ENV=PRODUCTION | 是 | 生产环境 |
-| NODE_ENV=development + APP_ENV=DEV | 否 | 正常开发环境 |
+| NODE_ENV=development + APP_ENV=DEV | 否 | 正常开发环境（本地 .env 推荐配置） |
 
 ## 代码规范
 
@@ -258,8 +258,9 @@ APP_ENV=DEV
 - 数据库表结构通过 Prisma Migrate 管理：
   - Schema 定义文件: `prisma/schema.prisma`
   - 迁移 SQL 文件存放在 `prisma/migrations/` 目录，随代码一同提交到 Git
-  - 开发环境: `prisma migrate dev` 生成迁移；生产环境: `prisma migrate deploy` 执行迁移
-- 开发环境初始化脚本 (`sql/` 目录) 仅用于本地从零创建，生产环境禁用
+  - 开发环境: `pnpm run prisma:migrate --name xxx` 生成迁移
+  - 生产环境: `pnpm run prisma:migrate:deploy` 执行迁移
+- 种子数据由 `prisma/seed.ts` 管理，开发环境通过 `ADMIN_DEFAULT_PASSWORD=xxx pnpm run prisma:seed` 执行
 
 ## 性能优化
 

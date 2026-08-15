@@ -200,7 +200,7 @@ ADMIN_DEFAULT_USERNAME=cb_mome_root
 | id       | INT          | PRIMARY KEY AUTO_INCREMENT | 角色唯一标识    |
 | name     | VARCHAR(64)  | UNIQUE NOT NULL            | 角色名称      |
 | description| TEXT      | -                          | 角色描述      |
-| permissions| TEXT     | NOT NULL DEFAULT '[]'      | 权限列表（JSON） |
+| permissions| VARCHAR(512) | NOT NULL DEFAULT '[]'  | 权限列表（JSON 字符串） |
 | created_at| DATETIME    | DEFAULT CURRENT_TIMESTAMP  | 创建时间      |
 | updated_at| DATETIME    | DEFAULT CURRENT_TIMESTAMP  | 更新时间      |
 
@@ -239,7 +239,7 @@ menu (独立表)
 
 ## 数据初始化
 
-数据库初始化脚本位于 `sql/init.sql`，包含以下初始数据：
+Prisma Seed 脚本位于 `prisma/seed.ts`，类型安全地写入所有初始数据。初始化流程为：**先执行迁移建表，再执行 seed 填充数据**。
 
 ### 初始相册数据
 
@@ -297,17 +297,17 @@ menu (独立表)
 
 ## 操作命令
 
-### 数据库初始化（仅开发环境可用）
+### 首次初始化（开发环境从零开始）
 
 ```bash
-ADMIN_DEFAULT_PASSWORD=your_secure_password pnpm run init-db
+# 1. 生成/应用迁移并建表
+pnpm run prisma:migrate --name init_db
+
+# 2. 填充种子数据并创建管理员（需设置管理员密码）
+ADMIN_DEFAULT_PASSWORD=your_secure_password pnpm run prisma:seed
 ```
 
-### 重置数据库（仅开发环境可用，清空并重新初始化）
-
-```bash
-ADMIN_DEFAULT_PASSWORD=your_secure_password pnpm run reset-db
-```
+> 如果本地数据库已存在旧表/迁移历史导致 drift，可先清空数据库后再执行以上步骤。
 
 ### Prisma 常用命令
 
@@ -319,6 +319,7 @@ ADMIN_DEFAULT_PASSWORD=your_secure_password pnpm run reset-db
 | ---- | ---- | ----------- |
 | `pnpm run prisma:generate` | 生成 Prisma Client 代码 | ✅ |
 | `pnpm run prisma:migrate --name xxx` | 创建新迁移并同步数据库（开发用） | ❌ 会被拦截 |
+| `pnpm run prisma:seed` | 清空旧数据后重新写入种子数据 + 创建管理员账号（需 `ADMIN_DEFAULT_PASSWORD`） | ❌ 会被拦截 |
 | `pnpm run prisma:validate` | 验证 schema.prisma 语法正确性 | ✅ |
 | `pnpm run prisma:status` | 查看当前迁移状态 | ✅ |
 | `pnpm run prisma:studio` | 打开 Prisma Studio 可视化界面 | ❌ 会被拦截 |
@@ -328,6 +329,7 @@ ADMIN_DEFAULT_PASSWORD=your_secure_password pnpm run reset-db
 | 命令 | 说明 |
 | ---- | ---- |
 | `pnpm run prisma:migrate:deploy` | **生产部署迁移**：仅执行已存在的迁移文件，不会修改 schema 或重建表 |
+| `pnpm run prisma:generate` | 生成最新的 Prisma Client 类型代码（与迁移配套） |
 
 ### 表结构变更工作流（生产安全）
 
@@ -339,7 +341,8 @@ ADMIN_DEFAULT_PASSWORD=your_secure_password pnpm run reset-db
 │  1. 修改 prisma/schema.prisma                                     │
 │  2. 执行：pnpm run prisma:migrate --name add_field_xxx           │
 │     → 生成 prisma/migrations/xxx/migration.sql                   │
-│  3. 本地测试验证无误后，提交迁移文件到 Git                         │
+│  3. 如有种子数据变更，同步更新 prisma/seed.ts                    │
+│  4. 本地测试验证无误后，提交迁移文件 + seed.ts 变更到 Git          │
 └──────────────────────────────────────────────────────────────────┘
                            ↓
 ┌──────────────────────────────────────────────────────────────────┐
@@ -349,6 +352,8 @@ ADMIN_DEFAULT_PASSWORD=your_secure_password pnpm run reset-db
 │     → 仅执行新的迁移 SQL，不会重建表，不会丢失数据                  │
 │  3. 执行：pnpm run prisma:generate                               │
 │     → 生成最新的 Prisma Client 代码                               │
+│  4. 如需填充种子数据（首次部署），按需手动执行 prisma:seed        │
+│     （生产环境种子数据填充需谨慎评估后操作）                        │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -376,8 +381,7 @@ ADMIN_DEFAULT_PASSWORD=your_secure_password pnpm run reset-db
 | `prisma db push` | 直接强制推送 schema，可能重建表结构，无迁移记录 |
 | `prisma db seed` | 种子数据填充，可能覆盖现有生产数据 |
 | `prisma studio` | 可视化工具，生产环境不建议暴露数据库操作 |
-| `pnpm run init-db` | 初始化脚本，会 DROP 表并重建，数据全部丢失 |
-| `pnpm run reset-db` | 同上，别名命令 |
+| `pnpm run prisma:seed` | Prisma Seed 脚本，生产环境会清空所有数据后重写，已内置生产拦截 |
 
 ### 安全包装脚本实现
 
@@ -426,12 +430,13 @@ npx prisma migrate dev --name emergency_fix
 ```
 ├── prisma/
 │   ├── schema.prisma       # Prisma 数据模型定义（数据表结构）
+│   ├── seed.ts             # Prisma Seed 脚本：类型安全写入初始数据 + 管理员账号
 │   ├── generated/client/   # Prisma 自动生成的 Client 代码（不要手动修改）
-│   └── migrations/         # 迁移 SQL 文件目录（每个变更一个子目录）
+│   └── migrations/         # 迁移 SQL 文件目录（每个变更一个子目录，随 Git 提交）
 ├── prisma.config.ts        # Prisma CLI 配置文件
-├── sql/
-│   ├── schema.sql          # 建表 SQL（init-db 脚本使用）
-│   └── seed-data.sql       # 初始数据 SQL（init-db 脚本使用）
+├── sql/                    # SQL 存档（不再被脚本调用，仅作参考）
+│   ├── schema.sql          # 建表 SQL（历史存档，已由 prisma/migrations 取代）
+│   └── seed-data.sql       # 初始数据 SQL（历史存档，已由 prisma/seed.ts 取代）
 └── src/
     ├── lib/
     │   ├── prisma.ts       # Prisma Client 实例（MariaDB Adapter）
@@ -444,8 +449,7 @@ npx prisma migrate dev --name emergency_fix
     │       ├── users.ts
     │       └── userRoles.ts
     └── scripts/
-        ├── safe-prisma.ts  # Prisma 命令安全包装脚本（生产环境拦截）
-        └── initDb.ts       # 数据库初始化脚本（开发环境，生产环境被拦截）
+        └── safe-prisma.ts  # Prisma 命令安全包装脚本（生产环境拦截危险命令）
 ```
 
 ## 索引建议
