@@ -3,6 +3,7 @@ import { Lock } from 'lucide-react';
 import Link from 'next/link';
 import localStyle from './index.module.css';
 import type { Album } from '../../lib/repositories/albums';
+import { deriveResponsiveFromOriginalUrl } from '../../lib/responsive-image';
 
 const cx = classnames.bind(localStyle);
 
@@ -18,11 +19,26 @@ function AlbumCard(props: IAlbumCardProps) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   };
 
+  const coverResponsive = deriveResponsiveFromOriginalUrl(album.cover_image_url ?? '');
+
   return (
     <Link href={`/albums/${album.slug}`} className={cx('album-card')}>
       <article>
         <div className={cx('album-cover')}>
-          <img src={album.cover_image_url ?? ''} alt={album.cover_image_alt ?? ''} loading="lazy" />
+          <picture>
+            {coverResponsive.avifSrcSet && (
+              <source type="image/avif" srcSet={coverResponsive.avifSrcSet} sizes={coverResponsive.sizes} />
+            )}
+            {coverResponsive.webpSrcSet && (
+              <source type="image/webp" srcSet={coverResponsive.webpSrcSet} sizes={coverResponsive.sizes} />
+            )}
+            <img
+              src={album.cover_image_url ?? ''}
+              alt={album.cover_image_alt ?? ''}
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
           {album.is_private ? (
             <span className={cx('private-badge')} aria-label="私密相册">
               <Lock size={16} strokeWidth={2.2} />

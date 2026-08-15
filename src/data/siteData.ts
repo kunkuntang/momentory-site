@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { getAllAlbums, getAlbumBySlug, type Album, type Photo } from '../lib/repositories/albums';
 import { getActiveCarouselItems, type HomeCarouselItem } from '../lib/repositories/homeCarousel';
 import { getActiveFeaturedPhotos, type FeaturedPhoto } from '../lib/repositories/featuredPhotos';
@@ -35,7 +36,7 @@ export interface SiteData {
   };
 }
 
-export async function getSiteData(): Promise<SiteData> {
+export const getSiteData = cache(async function getSiteData(): Promise<SiteData> {
   // console.log('getSiteData');
   const siteInfo = await getSiteInfo();
   const menuItems = await getMenuItems();
@@ -74,7 +75,7 @@ export async function getSiteData(): Promise<SiteData> {
       interests: ['旅行摄影', '城市观察', '自然光', '影像叙事'],
     },
   };
-}
+});
 
 export type AlbumWithPhotos = Album & { photos: Photo[] };
 export type AlbumPhoto = Photo;
