@@ -34,7 +34,8 @@
     "react-dom": "^18.3.1",
     "sharp": "^0.35.3",
     "tmc-cli": "^0.1.6",
-    "tmc-cli-plugin-web": "^0.1.6"
+    "tmc-cli-plugin-web": "^0.1.6",
+    "yet-another-react-lightbox": "^3.32.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",

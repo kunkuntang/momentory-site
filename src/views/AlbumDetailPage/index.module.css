@@ -41,6 +41,17 @@
   margin: 0;
   border-radius: 12px;
   background: var(--soft);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.photo-card:hover {
+  transform: translateY(-2px);
+}
+
+.photo-card:focus-visible {
+  outline: 2px solid var(--accent-dark, #333);
+  outline-offset: 2px;
 }
 
 .photo-card img {

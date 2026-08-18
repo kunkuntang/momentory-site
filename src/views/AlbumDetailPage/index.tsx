@@ -3,6 +3,7 @@ import Link from 'next/link';
 import AlbumAccessGate from '../../components/AlbumAccessGate';
 import PageHero from '../../components/PageHero';
 import type { AlbumWithPhotos } from '../../lib/repositories/albums';
+import AlbumGallery from './AlbumGallery';
 import localStyle from './index.module.css';
 
 const cx = classnames.bind(localStyle);
@@ -18,16 +19,6 @@ function AlbumDetailPage(props: IAlbumDetailPageProps) {
     const d = new Date(date);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   };
-
-  const gallery = (
-    <div className={cx('gallery-grid')}>
-      {album.photos.map((photo, index) => (
-        <figure key={`${album.id}-${index}`} className={cx('photo-card')}>
-          <img src={photo.image_url} alt={photo.image_alt ?? ''} loading="lazy" />
-        </figure>
-      ))}
-    </div>
-  );
 
   return (
     <main className={cx('page-main')}>
@@ -53,10 +44,10 @@ function AlbumDetailPage(props: IAlbumDetailPageProps) {
               title="这是一个私密相册"
               description="请输入访问密码后查看该相册内的全部图片。当前浏览器会记住这本相册的解锁状态。"
             >
-              {gallery}
+              <AlbumGallery photos={album.photos} />
             </AlbumAccessGate>
           ) : (
-            gallery
+            <AlbumGallery photos={album.photos} />
           )}
         </div>
       </section>

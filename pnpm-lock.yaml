@@ -68,6 +68,9 @@ importers:
       tmc-cli-plugin-web:
         specifier: ^0.1.6
         version: 0.1.6(commander@14.0.3)(tmc-cli-shared@0.1.6(commander@14.0.3))
+      yet-another-react-lightbox:
+        specifier: ^3.32.2
+        version: 3.32.2(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@types/bcryptjs':
         specifier: ^3.0.0
@@ -2065,6 +2068,20 @@ packages:
     engines: {node: '>= 8'}
     hasBin: true
 
+  yet-another-react-lightbox@3.32.2:
+    resolution: {integrity: sha512-F4HtHQfUNpvkj+AmECgWM4XRdCqMY5gXpKgOUx39+T+FyxLe8II4SK/pwMyYj2X54KH9lFSQeHYY1/GfYf3SdA==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@types/react': ^16 || ^17 || ^18 || ^19
+      '@types/react-dom': ^16 || ^17 || ^18 || ^19
+      react: ^16.8.0 || ^17 || ^18 || ^19
+      react-dom: ^16.8.0 || ^17 || ^18 || ^19
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
   zeptomatch@2.1.0:
     resolution: {integrity: sha512-KiGErG2J0G82LSpniV0CtIzjlJ10E04j02VOudJsPyPwNZgGnRKQy7I1R7GMyg/QswnE4l7ohSGrQbQbjXPPDA==}
 
@@ -3913,6 +3930,14 @@ snapshots:
   which@2.0.2:
     dependencies:
       isexe: 2.0.0
+
+  yet-another-react-lightbox@3.32.2(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    optionalDependencies:
+      '@types/react': 18.3.31
+      '@types/react-dom': 18.3.7(@types/react@18.3.31)
 
   zeptomatch@2.1.0:
     dependencies:
