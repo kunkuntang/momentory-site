@@ -42,6 +42,8 @@ export type AlbumMinAggregateOutputType = {
   cover_image_url: string | null
   cover_image_alt: string | null
   is_private: boolean | null
+  is_hidden: boolean | null
+  password_hash: string | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -54,6 +56,8 @@ export type AlbumMaxAggregateOutputType = {
   cover_image_url: string | null
   cover_image_alt: string | null
   is_private: boolean | null
+  is_hidden: boolean | null
+  password_hash: string | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -66,6 +70,8 @@ export type AlbumCountAggregateOutputType = {
   cover_image_url: number
   cover_image_alt: number
   is_private: number
+  is_hidden: number
+  password_hash: number
   created_at: number
   updated_at: number
   _all: number
@@ -88,6 +94,8 @@ export type AlbumMinAggregateInputType = {
   cover_image_url?: true
   cover_image_alt?: true
   is_private?: true
+  is_hidden?: true
+  password_hash?: true
   created_at?: true
   updated_at?: true
 }
@@ -100,6 +108,8 @@ export type AlbumMaxAggregateInputType = {
   cover_image_url?: true
   cover_image_alt?: true
   is_private?: true
+  is_hidden?: true
+  password_hash?: true
   created_at?: true
   updated_at?: true
 }
@@ -112,6 +122,8 @@ export type AlbumCountAggregateInputType = {
   cover_image_url?: true
   cover_image_alt?: true
   is_private?: true
+  is_hidden?: true
+  password_hash?: true
   created_at?: true
   updated_at?: true
   _all?: true
@@ -211,6 +223,8 @@ export type AlbumGroupByOutputType = {
   cover_image_url: string | null
   cover_image_alt: string | null
   is_private: boolean
+  is_hidden: boolean
+  password_hash: string | null
   created_at: Date
   updated_at: Date
   _count: AlbumCountAggregateOutputType | null
@@ -246,6 +260,8 @@ export type AlbumWhereInput = {
   cover_image_url?: Prisma.StringNullableFilter<"Album"> | string | null
   cover_image_alt?: Prisma.StringNullableFilter<"Album"> | string | null
   is_private?: Prisma.BoolFilter<"Album"> | boolean
+  is_hidden?: Prisma.BoolFilter<"Album"> | boolean
+  password_hash?: Prisma.StringNullableFilter<"Album"> | string | null
   created_at?: Prisma.DateTimeFilter<"Album"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Album"> | Date | string
   photos?: Prisma.PhotoListRelationFilter
@@ -259,6 +275,8 @@ export type AlbumOrderByWithRelationInput = {
   cover_image_url?: Prisma.SortOrderInput | Prisma.SortOrder
   cover_image_alt?: Prisma.SortOrderInput | Prisma.SortOrder
   is_private?: Prisma.SortOrder
+  is_hidden?: Prisma.SortOrder
+  password_hash?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   photos?: Prisma.PhotoOrderByRelationAggregateInput
@@ -276,6 +294,8 @@ export type AlbumWhereUniqueInput = Prisma.AtLeast<{
   cover_image_url?: Prisma.StringNullableFilter<"Album"> | string | null
   cover_image_alt?: Prisma.StringNullableFilter<"Album"> | string | null
   is_private?: Prisma.BoolFilter<"Album"> | boolean
+  is_hidden?: Prisma.BoolFilter<"Album"> | boolean
+  password_hash?: Prisma.StringNullableFilter<"Album"> | string | null
   created_at?: Prisma.DateTimeFilter<"Album"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Album"> | Date | string
   photos?: Prisma.PhotoListRelationFilter
@@ -289,6 +309,8 @@ export type AlbumOrderByWithAggregationInput = {
   cover_image_url?: Prisma.SortOrderInput | Prisma.SortOrder
   cover_image_alt?: Prisma.SortOrderInput | Prisma.SortOrder
   is_private?: Prisma.SortOrder
+  is_hidden?: Prisma.SortOrder
+  password_hash?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   _count?: Prisma.AlbumCountOrderByAggregateInput
@@ -309,6 +331,8 @@ export type AlbumScalarWhereWithAggregatesInput = {
   cover_image_url?: Prisma.StringNullableWithAggregatesFilter<"Album"> | string | null
   cover_image_alt?: Prisma.StringNullableWithAggregatesFilter<"Album"> | string | null
   is_private?: Prisma.BoolWithAggregatesFilter<"Album"> | boolean
+  is_hidden?: Prisma.BoolWithAggregatesFilter<"Album"> | boolean
+  password_hash?: Prisma.StringNullableWithAggregatesFilter<"Album"> | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Album"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"Album"> | Date | string
 }
@@ -320,6 +344,8 @@ export type AlbumCreateInput = {
   cover_image_url?: string | null
   cover_image_alt?: string | null
   is_private?: boolean
+  is_hidden?: boolean
+  password_hash?: string | null
   created_at?: Date | string
   updated_at?: Date | string
   photos?: Prisma.PhotoCreateNestedManyWithoutAlbumInput
@@ -333,6 +359,8 @@ export type AlbumUncheckedCreateInput = {
   cover_image_url?: string | null
   cover_image_alt?: string | null
   is_private?: boolean
+  is_hidden?: boolean
+  password_hash?: string | null
   created_at?: Date | string
   updated_at?: Date | string
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutAlbumInput
@@ -345,6 +373,8 @@ export type AlbumUpdateInput = {
   cover_image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_image_alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_private?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  password_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   photos?: Prisma.PhotoUpdateManyWithoutAlbumNestedInput
@@ -358,6 +388,8 @@ export type AlbumUncheckedUpdateInput = {
   cover_image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_image_alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_private?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  password_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutAlbumNestedInput
@@ -371,6 +403,8 @@ export type AlbumCreateManyInput = {
   cover_image_url?: string | null
   cover_image_alt?: string | null
   is_private?: boolean
+  is_hidden?: boolean
+  password_hash?: string | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -382,6 +416,8 @@ export type AlbumUpdateManyMutationInput = {
   cover_image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_image_alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_private?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  password_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -394,6 +430,8 @@ export type AlbumUncheckedUpdateManyInput = {
   cover_image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_image_alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_private?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  password_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -412,6 +450,8 @@ export type AlbumCountOrderByAggregateInput = {
   cover_image_url?: Prisma.SortOrder
   cover_image_alt?: Prisma.SortOrder
   is_private?: Prisma.SortOrder
+  is_hidden?: Prisma.SortOrder
+  password_hash?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -428,6 +468,8 @@ export type AlbumMaxOrderByAggregateInput = {
   cover_image_url?: Prisma.SortOrder
   cover_image_alt?: Prisma.SortOrder
   is_private?: Prisma.SortOrder
+  is_hidden?: Prisma.SortOrder
+  password_hash?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -440,6 +482,8 @@ export type AlbumMinOrderByAggregateInput = {
   cover_image_url?: Prisma.SortOrder
   cover_image_alt?: Prisma.SortOrder
   is_private?: Prisma.SortOrder
+  is_hidden?: Prisma.SortOrder
+  password_hash?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -498,6 +542,8 @@ export type AlbumCreateWithoutPhotosInput = {
   cover_image_url?: string | null
   cover_image_alt?: string | null
   is_private?: boolean
+  is_hidden?: boolean
+  password_hash?: string | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -510,6 +556,8 @@ export type AlbumUncheckedCreateWithoutPhotosInput = {
   cover_image_url?: string | null
   cover_image_alt?: string | null
   is_private?: boolean
+  is_hidden?: boolean
+  password_hash?: string | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -537,6 +585,8 @@ export type AlbumUpdateWithoutPhotosInput = {
   cover_image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_image_alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_private?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  password_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -549,6 +599,8 @@ export type AlbumUncheckedUpdateWithoutPhotosInput = {
   cover_image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_image_alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_private?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  password_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -592,6 +644,8 @@ export type AlbumSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   cover_image_url?: boolean
   cover_image_alt?: boolean
   is_private?: boolean
+  is_hidden?: boolean
+  password_hash?: boolean
   created_at?: boolean
   updated_at?: boolean
   photos?: boolean | Prisma.Album$photosArgs<ExtArgs>
@@ -608,11 +662,13 @@ export type AlbumSelectScalar = {
   cover_image_url?: boolean
   cover_image_alt?: boolean
   is_private?: boolean
+  is_hidden?: boolean
+  password_hash?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type AlbumOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "title" | "summary" | "cover_image_url" | "cover_image_alt" | "is_private" | "created_at" | "updated_at", ExtArgs["result"]["album"]>
+export type AlbumOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "title" | "summary" | "cover_image_url" | "cover_image_alt" | "is_private" | "is_hidden" | "password_hash" | "created_at" | "updated_at", ExtArgs["result"]["album"]>
 export type AlbumInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   photos?: boolean | Prisma.Album$photosArgs<ExtArgs>
   _count?: boolean | Prisma.AlbumCountOutputTypeDefaultArgs<ExtArgs>
@@ -631,6 +687,8 @@ export type $AlbumPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     cover_image_url: string | null
     cover_image_alt: string | null
     is_private: boolean
+    is_hidden: boolean
+    password_hash: string | null
     created_at: Date
     updated_at: Date
   }, ExtArgs["result"]["album"]>
@@ -1010,6 +1068,8 @@ export interface AlbumFieldRefs {
   readonly cover_image_url: Prisma.FieldRef<"Album", 'String'>
   readonly cover_image_alt: Prisma.FieldRef<"Album", 'String'>
   readonly is_private: Prisma.FieldRef<"Album", 'Boolean'>
+  readonly is_hidden: Prisma.FieldRef<"Album", 'Boolean'>
+  readonly password_hash: Prisma.FieldRef<"Album", 'String'>
   readonly created_at: Prisma.FieldRef<"Album", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"Album", 'DateTime'>
 }

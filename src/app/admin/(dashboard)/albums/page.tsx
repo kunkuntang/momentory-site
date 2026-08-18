@@ -31,8 +31,30 @@ export default async function AlbumsPage() {
     },
     {
       key: 'is_private',
-      label: '是否私密',
+      label: '私密',
       render: (item) => (item.is_private ? '是' : '否'),
+    },
+    {
+      key: 'is_hidden',
+      label: '隐藏',
+      render: (item) => (item.is_hidden ? '是' : '否'),
+    },
+    {
+      key: 'access',
+      label: '访问链接',
+      render: (item) =>
+        item.is_hidden ? (
+          <a
+            href={`/albums/${item.slug}`}
+            target="_blank"
+            rel="noreferrer"
+            className="text-admin-accent hover:underline text-sm"
+          >
+            打开链接
+          </a>
+        ) : (
+          <span className="text-admin-muted text-sm">—</span>
+        ),
     },
     {
       key: "created_at",

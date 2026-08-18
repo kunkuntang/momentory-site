@@ -2,12 +2,12 @@ import classnames from "classnames/bind";
 import localStyle from "./index.module.css";
 import AlbumCard from "../../components/AlbumCard";
 import PageHero from "../../components/PageHero";
-import { getAllAlbums } from "../../lib/repositories/albums";
+import { getPublicAlbums } from "../../lib/repositories/albums";
 
 const cx = classnames.bind(localStyle);
 
 async function AlbumsPage() {
-  const albums = await getAllAlbums();
+  const albums = await getPublicAlbums();
 
   return (
     <main className={cx("page-main")}>

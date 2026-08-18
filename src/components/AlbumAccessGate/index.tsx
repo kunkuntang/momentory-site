@@ -2,15 +2,16 @@
 
 import { FormEvent, PropsWithChildren, useEffect, useState } from 'react';
 import classnames from 'classnames/bind';
+import { verifyAlbumPasswordAction } from '@/lib/actions/albumAccess';
 import localStyle from './index.module.css';
 
 const cx = classnames.bind(localStyle);
-const configuredPassword = process.env.NEXT_PUBLIC_ALBUM_PASSWORD?.trim() ?? '';
 
 interface IAlbumAccessGateProps extends PropsWithChildren {
   title?: string;
   description?: string;
   storageKey?: string;
+  albumSlug?: string;
 }
 
 function AlbumAccessGate(props: IAlbumAccessGateProps) {
@@ -19,38 +20,42 @@ function AlbumAccessGate(props: IAlbumAccessGateProps) {
     title = '相册需要密码访问',
     description = '输入密码后即可查看站内相册内容。本次设备解锁后，在当前浏览器里会保持访问状态。',
     storageKey = 'momentory.albumAccessGranted',
+    albumSlug,
   } = props;
   const [password, setPassword] = useState('');
-  const [hasAccess, setHasAccess] = useState(!configuredPassword);
+  const [hasAccess, setHasAccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
 
   useEffect(() => {
-    if (!configuredPassword) {
-      setHasAccess(true);
-      return;
-    }
-
     const isGranted = window.sessionStorage.getItem(storageKey) === 'true';
     setHasAccess(isGranted);
   }, [storageKey]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!configuredPassword) {
-      setHasAccess(true);
+    if (!password) {
       return;
     }
 
-    if (password === configuredPassword) {
-      window.sessionStorage.setItem(storageKey, 'true');
-      setHasAccess(true);
-      setErrorMessage('');
-      setPassword('');
-      return;
-    }
+    setIsVerifying(true);
+    setErrorMessage('');
 
-    setErrorMessage('密码不正确，请重试。');
+    try {
+      const ok = await verifyAlbumPasswordAction(albumSlug ?? '', password);
+      if (ok) {
+        window.sessionStorage.setItem(storageKey, 'true');
+        setHasAccess(true);
+        setPassword('');
+        return;
+      }
+      setErrorMessage('密码不正确，请重试。');
+    } catch {
+      setErrorMessage('校验失败，请稍后再试。');
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   if (hasAccess) {
@@ -74,9 +79,10 @@ function AlbumAccessGate(props: IAlbumAccessGateProps) {
               setErrorMessage('');
             }
           }}
+          disabled={isVerifying}
         />
-        <button className={cx('submit')} type="submit">
-          解锁相册
+        <button className={cx('submit')} type="submit" disabled={isVerifying}>
+          {isVerifying ? '校验中…' : '解锁相册'}
         </button>
       </form>
       {errorMessage ? <p className={cx('error')}>{errorMessage}</p> : null}

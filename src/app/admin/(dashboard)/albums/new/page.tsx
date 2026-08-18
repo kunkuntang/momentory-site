@@ -10,6 +10,7 @@ import { createAlbumAction } from '../actions';
 
 export default function NewAlbumPage() {
   const [coverImageUrl, setCoverImageUrl] = useState('');
+  const [isPrivate, setIsPrivate] = useState(false);
 
   const handleCoverImageChange = (url: string) => {
     setCoverImageUrl(url);
@@ -47,9 +48,23 @@ export default function NewAlbumPage() {
             <Input name="cover_image_alt" placeholder="封面图片描述" />
           </FormField>
 
-          <div className="mb-4">
-            <Checkbox name="is_private" label="私密相册" />
-          </div>
+          <FormField label="相册属性" name="album_properties">
+            <div className="space-y-3">
+              <Checkbox name="is_private" label="私密相册" checked={isPrivate} onChange={setIsPrivate} />
+              <Checkbox name="is_hidden" label="隐藏相册" />
+              {isPrivate ? (
+                <Input
+                  name="password"
+                  type="password"
+                  placeholder="请输入私密相册访问密码"
+                  autoComplete="new-password"
+                />
+              ) : null}
+            </div>
+            <p className="text-xs text-admin-muted mt-1">
+              私密相册需要访问密码才能查看；隐藏相册不会出现在首页和相册列表中，仅可通过链接访问。
+            </p>
+          </FormField>
 
           <div className="flex items-center gap-3">
             <SubmitButton label="创建相册" />

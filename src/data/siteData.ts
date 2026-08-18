@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { getAllAlbums, getAlbumBySlug, type Album, type Photo } from '../lib/repositories/albums';
+import { getPublicAlbums, getAlbumBySlug, type Album, type Photo } from '../lib/repositories/albums';
 import { getActiveCarouselItems, type HomeCarouselItem } from '../lib/repositories/homeCarousel';
 import { getActiveFeaturedPhotos, type FeaturedPhoto } from '../lib/repositories/featuredPhotos';
 import { getSiteInfo, getMenuItems, type MenuItem } from '../lib/repositories/siteConfig';
@@ -41,7 +41,7 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
   const siteInfo = await getSiteInfo();
   const menuItems = await getMenuItems();
   const carouselItems = await getActiveCarouselItems();
-  const albums = await getAllAlbums();
+  const albums = await getPublicAlbums();
   const featured = await getActiveFeaturedPhotos();
 
   return {

@@ -14,6 +14,7 @@ interface EditAlbumFormProps {
 
 export default function EditAlbumForm({ album }: EditAlbumFormProps) {
   const [coverImageUrl, setCoverImageUrl] = useState(album.cover_image_url ?? '');
+  const [isPrivate, setIsPrivate] = useState(!!album.is_private);
 
   const handleCoverImageChange = (url: string) => {
     setCoverImageUrl(url);
@@ -49,9 +50,23 @@ export default function EditAlbumForm({ album }: EditAlbumFormProps) {
         <Input name="cover_image_alt" defaultValue={album.cover_image_alt ?? ''} />
       </FormField>
 
-      <div className="mb-4">
-        <Checkbox name="is_private" label="私密相册" defaultChecked={!!album.is_private} />
-      </div>
+      <FormField label="相册属性" name="album_properties">
+        <div className="space-y-3 mb-4">
+          <Checkbox name="is_private" label="私密相册" checked={isPrivate} onChange={setIsPrivate} />
+          <Checkbox name="is_hidden" label="隐藏相册" defaultChecked={!!album.is_hidden} />
+          {isPrivate ? (
+            <Input
+              name="password"
+              type="password"
+              placeholder={album.password_hash ? '留空则保持原密码不变' : '请输入私密相册访问密码'}
+              autoComplete="new-password"
+            />
+          ) : null}
+        </div>
+        <p className="text-xs text-admin-muted mt-1">
+          私密相册需要访问密码才能查看；隐藏相册不会出现在首页和相册列表中，仅可通过链接访问。
+        </p>
+      </FormField>
 
       <div className="flex items-center gap-3">
         <SubmitButton label="保存修改" />

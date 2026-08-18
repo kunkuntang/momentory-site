@@ -1053,6 +1053,8 @@ export const AlbumScalarFieldEnum = {
   cover_image_url: 'cover_image_url',
   cover_image_alt: 'cover_image_alt',
   is_private: 'is_private',
+  is_hidden: 'is_hidden',
+  password_hash: 'password_hash',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
@@ -1207,7 +1209,8 @@ export const AlbumOrderByRelevanceFieldEnum = {
   title: 'title',
   summary: 'summary',
   cover_image_url: 'cover_image_url',
-  cover_image_alt: 'cover_image_alt'
+  cover_image_alt: 'cover_image_alt',
+  password_hash: 'password_hash'
 } as const
 
 export type AlbumOrderByRelevanceFieldEnum = (typeof AlbumOrderByRelevanceFieldEnum)[keyof typeof AlbumOrderByRelevanceFieldEnum]

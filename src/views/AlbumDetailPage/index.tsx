@@ -43,11 +43,12 @@ function AlbumDetailPage(props: IAlbumDetailPageProps) {
           </Link>
           <div className={cx('album-head')}>
             <p className={cx('album-meta')}>
-              {formatDate(album.created_at)} / {(album as any).photo_count || album.photos.length} 张照片 {album.is_private ? '/ 私密相册' : ''}
+              {formatDate(album.created_at)} / {(album as any).photo_count || album.photos.length} 张照片 {album.is_private ? '/ 私密相册' : ''} {album.is_hidden ? '/ 隐藏相册' : ''}
             </p>
           </div>
           {album.is_private ? (
             <AlbumAccessGate
+              albumSlug={album.slug}
               storageKey={`momentory.albumAccessGranted.${album.slug}`}
               title="这是一个私密相册"
               description="请输入访问密码后查看该相册内的全部图片。当前浏览器会记住这本相册的解锁状态。"
