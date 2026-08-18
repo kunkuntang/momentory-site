@@ -47,7 +47,7 @@ export default async function EditSiteConfigPage({ params }: EditSiteConfigPageP
             <Input name="copyright" defaultValue={siteInfo.copyright} required />
           </FormField>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mt-6">
             <SubmitButton label="保存修改" />
             <Link
               href="/admin/site-config"

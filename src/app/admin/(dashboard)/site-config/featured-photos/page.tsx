@@ -57,6 +57,14 @@ export default async function FeaturedPhotosPage() {
         action={{ label: '新建精选照片', href: '/admin/site-config/featured-photos/new' }}
       />
       <DataTable columns={columns} data={photos} />
+      <div className="flex items-center gap-3 mt-6">
+        <Link
+          href="/admin/site-config"
+          className="px-4 py-2 bg-admin-accent text-white text-sm rounded-md hover:bg-admin-accent-dark transition-colors"
+        >
+          返回
+        </Link>
+      </div>
     </div>
   );
 }

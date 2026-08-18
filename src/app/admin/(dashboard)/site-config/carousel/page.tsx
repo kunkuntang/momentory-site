@@ -48,6 +48,14 @@ export default async function CarouselPage() {
         action={{ label: '新建轮播项', href: '/admin/site-config/carousel/new' }}
       />
       <DataTable columns={columns} data={items} />
+      <div className="flex items-center gap-3 mt-6">
+        <Link
+          href="/admin/site-config"
+          className="px-4 py-2 bg-admin-accent text-white text-sm rounded-md hover:bg-admin-accent-dark transition-colors"
+        >
+          返回
+        </Link>
+      </div>
     </div>
   );
 }
