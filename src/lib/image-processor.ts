@@ -186,7 +186,7 @@ export const processImage = async (
   const variants: ProcessedImageVariant[] = [];
   const formats: Array<{ format: ImageFormat; quality: number; contentType: string }> = [
     { format: 'webp', quality: 80, contentType: 'image/webp' },
-    { format: 'avif', quality: 60, contentType: 'image/avif' },
+    // { format: 'avif', quality: 60, contentType: 'image/avif' },
   ];
 
   const tasks: Array<Promise<void>> = [];
