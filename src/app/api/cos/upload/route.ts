@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
-import { uploadBuffer, getFileUrl } from '@/lib/cos';
+import { uploadBuffer, getFileUrl, headObjectInfo } from '@/lib/cos';
 import {
   validateImage,
   processImage,
@@ -9,6 +9,11 @@ import {
   buildSrcSet,
   buildSizesAttr,
   IMAGE_SIZES,
+  computeContentHash,
+  resolveOriginalExt,
+  buildExpectedKeys,
+  getImageMetadata,
+  type ProcessedImageResult,
 } from '@/lib/image-processor';
 const crypto = require('crypto');
 
@@ -70,57 +75,115 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const processed = await processImage(buffer, file);
-    const { contentHash, originalExt, original, variants } = processed;
+    // Compute content hash cheaply to check whether this exact image has
+    // already been processed & uploaded before (content-addressed keys).
+    const contentHash = computeContentHash(buffer);
+    const originalExt = resolveOriginalExt(file);
+    const expected = buildExpectedKeys(contentHash, originalExt);
 
+    // Probe COS in parallel: original + every expected variant.
+    const probeStart = Date.now();
+    const [originalHead, ...variantHeads] = await Promise.all([
+      headObjectInfo(expected.original),
+      ...expected.variants.map((v) => headObjectInfo(v.key)),
+    ]);
+    const allExist =
+      originalHead.exists && variantHeads.every((h) => h.exists);
     console.log(
-      `${logPrefix} processing done: hash=${contentHash.substring(0, 12)}... variants=${variants.length}`,
+      `${logPrefix} cache probe done in ${Date.now() - probeStart}ms allExist=${allExist}`,
     );
 
-    const cacheControl = getCacheControl();
-    const uploadTasks: Array<Promise<void>> = [];
+    let processed: ProcessedImageResult;
+    let skipUpload = false;
 
-    uploadTasks.push(
-      (async () => {
-        const t0 = Date.now();
-        await uploadBuffer(original.buffer, original.key, {
-          CacheControl: cacheControl,
-          ContentType: original.contentType,
-        });
-        console.log(
-          `${logPrefix} uploaded original ${original.key} in ${Date.now() - t0}ms (${(original.sizeBytes / 1024).toFixed(1)}KB)`,
-        );
-      })(),
-    );
-
-    for (const v of variants) {
-      uploadTasks.push(
-        (async () => {
-          const t0 = Date.now();
-          try {
-            await uploadBuffer(v.buffer, v.key, {
-              CacheControl: cacheControl,
-              ContentType: v.contentType,
-            });
-            console.log(
-              `${logPrefix} uploaded variant ${v.key} in ${Date.now() - t0}ms (${(v.sizeBytes / 1024).toFixed(1)}KB)`,
-            );
-          } catch (e) {
-            console.error(
-              `${logPrefix} FAILED to upload variant ${v.key}:`,
-              e,
-            );
-            throw e;
-          }
-        })(),
+    if (allExist) {
+      // Cache HIT: reuse existing objects, only read cheap header metadata.
+      const { width, height } = await getImageMetadata(buffer);
+      processed = {
+        contentHash,
+        originalExt,
+        original: {
+          key: expected.original,
+          buffer,
+          width,
+          height,
+          format: originalExt,
+          contentType: file.type,
+          sizeBytes: originalHead.sizeBytes || buffer.length,
+        },
+        variants: expected.variants.map((v, i) => ({
+          key: v.key,
+          buffer: Buffer.alloc(0),
+          width: v.width,
+          height: v.height,
+          format: v.format,
+          contentType: v.contentType,
+          sizeBytes: variantHeads[i].sizeBytes,
+        })),
+      };
+      skipUpload = true;
+      console.log(
+        `${logPrefix} cache HIT, skipping processing & upload (hash=${contentHash.substring(0, 12)}...)`,
+      );
+    } else {
+      // Cache MISS: run the expensive sharp pipeline.
+      processed = await processImage(buffer, file);
+      console.log(
+        `${logPrefix} cache MISS, processed ${processed.variants.length} variants (hash=${processed.contentHash.substring(0, 12)}...)`,
       );
     }
 
-    const uploadStart = Date.now();
-    await Promise.all(uploadTasks);
-    console.log(
-      `${logPrefix} all uploads finished in ${Date.now() - uploadStart}ms`,
-    );
+    const { original, variants } = processed;
+
+    const cacheControl = getCacheControl();
+
+    if (!skipUpload) {
+      const uploadTasks: Array<Promise<void>> = [];
+
+      uploadTasks.push(
+        (async () => {
+          const t0 = Date.now();
+          await uploadBuffer(original.buffer, original.key, {
+            CacheControl: cacheControl,
+            ContentType: original.contentType,
+          });
+          console.log(
+            `${logPrefix} uploaded original ${original.key} in ${Date.now() - t0}ms (${(original.sizeBytes / 1024).toFixed(1)}KB)`,
+          );
+        })(),
+      );
+
+      for (const v of variants) {
+        uploadTasks.push(
+          (async () => {
+            const t0 = Date.now();
+            try {
+              await uploadBuffer(v.buffer, v.key, {
+                CacheControl: cacheControl,
+                ContentType: v.contentType,
+              });
+              console.log(
+                `${logPrefix} uploaded variant ${v.key} in ${Date.now() - t0}ms (${(v.sizeBytes / 1024).toFixed(1)}KB)`,
+              );
+            } catch (e) {
+              console.error(
+                `${logPrefix} FAILED to upload variant ${v.key}:`,
+                e,
+              );
+              throw e;
+            }
+          })(),
+        );
+      }
+
+      const uploadStart = Date.now();
+      await Promise.all(uploadTasks);
+      console.log(
+        `${logPrefix} all uploads finished in ${Date.now() - uploadStart}ms`,
+      );
+    } else {
+      console.log(`${logPrefix} skipped upload (cache HIT)`);
+    }
 
     const urls = buildImageUrls(getFileUrl, contentHash, originalExt);
     const responseData: UploadResponseData = {

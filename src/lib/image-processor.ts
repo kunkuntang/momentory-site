@@ -156,6 +156,48 @@ export const buildSrcSet = (
 export const buildSizesAttr = (): string =>
   '(max-width: 480px) 400px, (max-width: 900px) 800px, (max-width: 1400px) 1200px, 2400px';
 
+export const VARIANT_FORMATS = [
+  { format: 'webp' as const, quality: 80, contentType: 'image/webp' },
+  { format: 'avif' as const, quality: 60, contentType: 'image/avif' },
+];
+
+export const resolveOriginalExt = (file: File): string =>
+  file.name.split('.').pop() || getExtFromMime(file.type);
+
+export interface ExpectedVariantKey {
+  key: string;
+  width: number;
+  height: number;
+  format: ImageFormat;
+  contentType: string;
+}
+
+export const buildExpectedKeys = (
+  contentHash: string,
+  originalExt: string,
+): { original: string; variants: ExpectedVariantKey[] } => {
+  const variants: ExpectedVariantKey[] = [];
+  for (const fmt of VARIANT_FORMATS) {
+    for (const size of IMAGE_SIZES) {
+      variants.push({
+        key: buildVariantKey(contentHash, size.width, fmt.format),
+        width: size.width,
+        height: size.height,
+        format: fmt.format,
+        contentType: fmt.contentType,
+      });
+    }
+  }
+  return { original: buildOriginalKey(contentHash, originalExt), variants };
+};
+
+export const getImageMetadata = async (
+  buffer: Buffer,
+): Promise<{ width: number; height: number }> => {
+  const meta = await sharp(buffer, { failOn: 'none' }).metadata();
+  return { width: meta.width ?? 0, height: meta.height ?? 0 };
+};
+
 export const processImage = async (
   buffer: Buffer,
   file: File,
@@ -184,14 +226,10 @@ export const processImage = async (
   );
 
   const variants: ProcessedImageVariant[] = [];
-  const formats: Array<{ format: ImageFormat; quality: number; contentType: string }> = [
-    { format: 'webp', quality: 80, contentType: 'image/webp' },
-    // { format: 'avif', quality: 60, contentType: 'image/avif' },
-  ];
 
   const tasks: Array<Promise<void>> = [];
 
-  for (const fmt of formats) {
+  for (const fmt of VARIANT_FORMATS) {
     for (const size of IMAGE_SIZES) {
       tasks.push(
         (async () => {

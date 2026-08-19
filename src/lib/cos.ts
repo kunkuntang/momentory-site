@@ -148,6 +148,43 @@ export const uploadBuffer = async (
   });
 };
 
+export interface ObjectHeadInfo {
+  exists: boolean;
+  sizeBytes: number;
+}
+
+export const headObjectInfo = async (key: string): Promise<ObjectHeadInfo> => {
+  const cos = createCosClient();
+  const config = getConfig();
+
+  let _tempUrl = key;
+  if (config.PathPrefix) {
+    _tempUrl = `${config.PathPrefix}/${key}`;
+  }
+
+  const bucketName = `${config.Bucket}-${config.BucketID}`;
+
+  try {
+    const data = await cos.headObject({
+      Bucket: bucketName,
+      Region: config.Region,
+      Key: _tempUrl,
+    });
+    const sizeBytes = Number(data?.headers?.['content-length'] || 0);
+    return { exists: true, sizeBytes };
+  } catch (err: unknown) {
+    const statusCode = (err as { statusCode?: number })?.statusCode;
+    if (statusCode === 404) {
+      return { exists: false, sizeBytes: 0 };
+    }
+    console.warn(
+      `[COS] headObject unexpected error for key=${key}:`,
+      err instanceof Error ? err.message : String(err),
+    );
+    return { exists: false, sizeBytes: 0 };
+  }
+};
+
 export const deleteFile = async (key: string): Promise<void> => {
   const cos = createCosClient();
   const config = getConfig();
