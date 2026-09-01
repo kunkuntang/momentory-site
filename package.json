@@ -12,7 +12,8 @@
     "prisma:validate": "node -r tsx src/scripts/safe-prisma.ts validate",
     "prisma:studio": "node -r tsx src/scripts/safe-prisma.ts studio",
     "prisma:status": "node -r tsx src/scripts/safe-prisma.ts migrate status",
-    "prisma:seed": "node -r tsx prisma/seed.ts"
+    "prisma:seed": "node -r tsx prisma/seed.ts",
+    "worker": "node -r tsx src/scripts/variant-worker.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -25,6 +26,7 @@
     "dotenv": "^17.4.2",
     "exifr": "^7.1.3",
     "gsap": "^3.15.0",
+    "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.468.0",
     "next": "^15.0.0",

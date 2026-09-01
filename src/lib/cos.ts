@@ -185,6 +185,25 @@ export const headObjectInfo = async (key: string): Promise<ObjectHeadInfo> => {
   }
 };
 
+export const getObjectBuffer = async (key: string): Promise<Buffer> => {
+  const cos = createCosClient();
+  const config = getConfig();
+
+  let _tempUrl = key;
+  if (config.PathPrefix) {
+    _tempUrl = `${config.PathPrefix}/${key}`;
+  }
+
+  const bucketName = `${config.Bucket}-${config.BucketID}`;
+
+  const data = await cos.getObject({
+    Bucket: bucketName,
+    Region: config.Region,
+    Key: _tempUrl,
+  });
+  return data.Body as Buffer;
+};
+
 export const deleteFile = async (key: string): Promise<void> => {
   const cos = createCosClient();
   const config = getConfig();

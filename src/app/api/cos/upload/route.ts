@@ -15,6 +15,7 @@ import {
   getImageMetadata,
   type ProcessedImageResult,
 } from '@/lib/image-processor';
+import { enqueueImageConversion } from '@/lib/image-queue';
 const crypto = require('crypto');
 
 export const runtime = 'nodejs';
@@ -126,11 +127,70 @@ export async function POST(request: Request) {
         `${logPrefix} cache HIT, skipping processing & upload (hash=${contentHash.substring(0, 12)}...)`,
       );
     } else {
-      // Cache MISS: run the expensive sharp pipeline.
-      processed = await processImage(buffer, file);
-      console.log(
-        `${logPrefix} cache MISS, processed ${processed.variants.length} variants (hash=${processed.contentHash.substring(0, 12)}...)`,
-      );
+      // Cache MISS: 立即上传原图并把变体转换任务入队，由后台 worker
+      // 异步处理，避免 sharp 转码大图导致接口超时。
+      let deferProcessing = true;
+      try {
+        const t0 = Date.now();
+        await uploadBuffer(buffer, expected.original, {
+          CacheControl: getCacheControl(),
+          ContentType: file.type,
+        });
+        console.log(
+          `${logPrefix} uploaded original ${expected.original} in ${Date.now() - t0}ms (${(buffer.length / 1024).toFixed(1)}KB)`,
+        );
+
+        await enqueueImageConversion({
+          contentHash,
+          originalExt,
+          originalKey: expected.original,
+          contentType: file.type,
+        });
+        console.log(
+          `${logPrefix} conversion job queued (hash=${contentHash.substring(0, 12)}...)`,
+        );
+      } catch (e) {
+        console.error(
+          `${logPrefix} defer processing failed, fallback to inline:`,
+          e,
+        );
+        deferProcessing = false;
+      }
+
+      if (deferProcessing) {
+        const { width, height } = await getImageMetadata(buffer);
+        processed = {
+          contentHash,
+          originalExt,
+          original: {
+            key: expected.original,
+            buffer,
+            width,
+            height,
+            format: originalExt,
+            contentType: file.type,
+            sizeBytes: buffer.length,
+          },
+          // 变体尚未生成，先返回预期 key 与尺寸（内容寻址，URL 确定），
+          // worker 完成转换后即可通过相同 URL 访问。
+          variants: expected.variants.map((v) => ({
+            key: v.key,
+            buffer: Buffer.alloc(0),
+            width: v.width,
+            height: v.height,
+            format: v.format,
+            contentType: v.contentType,
+            sizeBytes: 0,
+          })),
+        };
+        skipUpload = true;
+      } else {
+        // Redis 不可用等异常时回退为同步处理，保证功能可用。
+        processed = await processImage(buffer, file);
+        console.log(
+          `${logPrefix} cache MISS, processed ${processed.variants.length} variants (hash=${processed.contentHash.substring(0, 12)}...)`,
+        );
+      }
     }
 
     const { original, variants } = processed;

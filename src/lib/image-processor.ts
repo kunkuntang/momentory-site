@@ -161,8 +161,14 @@ export const VARIANT_FORMATS = [
   { format: 'avif' as const, quality: 60, contentType: 'image/avif' },
 ];
 
-export const resolveOriginalExt = (file: File): string =>
+export const resolveOriginalExt = (file: ImageLikeFile): string =>
   file.name.split('.').pop() || getExtFromMime(file.type);
+
+/** 与 File 结构兼容的最小类型，便于 worker 用普通对象调用 */
+export interface ImageLikeFile {
+  name: string;
+  type: string;
+}
 
 export interface ExpectedVariantKey {
   key: string;
@@ -200,7 +206,7 @@ export const getImageMetadata = async (
 
 export const processImage = async (
   buffer: Buffer,
-  file: File,
+  file: ImageLikeFile,
 ): Promise<ProcessedImageResult> => {
   const startTime = Date.now();
   const contentHash = computeContentHash(buffer);
