@@ -148,30 +148,30 @@ export function FileUploader({
                   controls
                   className="w-full max-h-64 object-contain bg-black"
                 />
-              ) : responsive?.avifSrcSet || responsive?.webpSrcSet ? (
-                <picture>
-                  {responsive.avifSrcSet && (
-                    <source
-                      type="image/avif"
-                      srcSet={responsive.avifSrcSet}
-                      sizes={responsive.sizes}
-                    />
-                  )}
-                  {responsive.webpSrcSet && (
-                    <source
-                      type="image/webp"
-                      srcSet={responsive.webpSrcSet}
-                      sizes={responsive.sizes}
-                    />
-                  )}
-                  <img
-                    src={value}
-                    alt="已上传图片"
-                    className="w-full max-h-64 object-contain bg-gray-50"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </picture>
+              // ) : responsive?.avifSrcSet || responsive?.webpSrcSet ? (
+              //   <picture>
+              //     {responsive.avifSrcSet && (
+              //       <source
+              //         type="image/avif"
+              //         srcSet={responsive.avifSrcSet}
+              //         sizes={responsive.sizes}
+              //       />
+              //     )}
+              //     {responsive.webpSrcSet && (
+              //       <source
+              //         type="image/webp"
+              //         srcSet={responsive.webpSrcSet}
+              //         sizes={responsive.sizes}
+              //       />
+              //     )}
+              //     <img
+              //       src={value}
+              //       alt="已上传图片"
+              //       className="w-full max-h-64 object-contain bg-gray-50"
+              //       loading="lazy"
+              //       decoding="async"
+              //     />
+              //   </picture>
               ) : (
                 <img
                   src={value}
