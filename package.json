@@ -13,7 +13,8 @@
     "prisma:studio": "node -r tsx src/scripts/safe-prisma.ts studio",
     "prisma:status": "node -r tsx src/scripts/safe-prisma.ts migrate status",
     "prisma:seed": "node -r tsx prisma/seed.ts",
-    "worker": "node -r tsx src/scripts/variant-worker.ts"
+    "worker:build": "esbuild src/scripts/variant-worker.ts --bundle --platform=node --format=cjs --packages=external --outfile=dist/worker.cjs",
+    "worker": "node dist/worker.cjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -48,6 +49,7 @@
     "@types/react-dom": "^18.3.1",
     "@types/sharp": "^0.32.0",
     "autoprefixer": "^10.5.3",
+    "esbuild": "^0.28.2",
     "postcss": "^8.5.19",
     "tailwindcss": "3",
     "tsx": "^4.23.0",
